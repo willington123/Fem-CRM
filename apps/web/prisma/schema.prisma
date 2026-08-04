@@ -1,0 +1,456 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================
+// ENUMS  (mapeados a los tipos PostgreSQL creados en Supabase)
+// ============================================================
+
+enum UserRole {
+  ADMIN
+  AGENT
+  ANALYST
+
+  @@map("user_role")
+}
+
+enum CustomerStatus {
+  NEW
+  ACTIVE
+  AT_RISK
+  RECURRING
+  LOST
+
+  @@map("customer_status")
+}
+
+enum ConversationStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+
+  @@map("conversation_status")
+}
+
+enum CrmChannel {
+  WHATSAPP
+  INSTAGRAM
+  FACEBOOK
+
+  @@map("crm_channel")
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+
+  @@map("message_direction")
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+
+  @@map("message_status")
+}
+
+enum OrderStatus {
+  PENDING_CONFIRMATION
+  CONFIRMED
+  PREPARING
+  DISPATCHED
+  IN_TRANSIT
+  IN_DESTINATION
+  DELIVERED
+  FAILED_DELIVERY
+  RETURNED
+  CANCELLED
+
+  @@map("order_status")
+}
+
+enum FlowTrigger {
+  ORDER_CREATED
+  ORDER_CONFIRMED
+  ORDER_DISPATCHED
+  ORDER_DELIVERED
+  ORDER_RETURNED
+  DAYS_AFTER_DELIVERY
+  NO_REPURCHASE_DAYS
+  MESSAGE_RECEIVED
+  KEYWORD_RECEIVED
+  ABANDONED_CART
+  ORDER_IN_TRANSIT
+  ORDER_OUT_FOR_DELIVERY
+  ORDER_AT_OFFICE
+  ORDER_NOVELTY
+  CONFIRMATION_REMINDER
+
+  @@map("flow_trigger")
+}
+
+enum TemplateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+
+  @@map("template_status")
+}
+
+enum TemplateCategory {
+  CONFIRMATION
+  LOGISTICS
+  REPURCHASE
+  SUPPORT
+  PROMOTIONAL
+
+  @@map("template_category")
+}
+
+enum IntegrationPlatform {
+  SHOPIFY
+  META
+  MASTERSHOP
+  WOOCOMMERCE
+
+  @@map("integration_platform")
+}
+
+enum WebhookEventStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  IGNORED
+
+  @@map("webhook_event_status")
+}
+
+enum CartStatus {
+  OPEN
+  RECOVERED
+  LOST
+
+  @@map("cart_status")
+}
+
+// ============================================================
+// MODELOS
+// ============================================================
+
+model CrmUser {
+  id         String   @id @default(uuid())
+  authUserId String?  @map("auth_user_id")
+  email      String   @unique
+  name       String
+  role       UserRole @default(AGENT)
+  avatar     String?
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  assignedConversations Conversation[]
+  activityLogs          ActivityLog[]
+  messages              Message[]      @relation("SentBy")
+
+  @@map("crm_users")
+}
+
+model Customer {
+  id               String         @id @default(uuid())
+  shopifyId        String?        @unique @map("shopify_id")
+  phone            String         @unique
+  email            String?
+  name             String
+  city             String?
+  department       String?
+  originChannel    CrmChannel?    @map("origin_channel")
+  status           CustomerStatus @default(NEW)
+  ltv              Decimal        @default(0) @db.Decimal(12, 2)
+  totalOrders      Int            @default(0) @map("total_orders")
+  lastPurchaseAt   DateTime?      @map("last_purchase_at")
+  firstContactAt   DateTime       @default(now()) @map("first_contact_at")
+  firstPurchaseAt  DateTime?      @map("first_purchase_at")
+  notes            String?
+  tags             String[]       @default([])
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  orders           Order[]
+  conversations    Conversation[]
+  flowExecutions   FlowExecution[]
+  abandonedCarts   AbandonedCart[]
+  mastershopGuides MastershopGuide[]
+
+  @@map("customers")
+}
+
+model IntegrationConfig {
+  id          String              @id @default(uuid())
+  platform    IntegrationPlatform
+  name        String
+  credentials Json                @default("{}")
+  settings    Json                @default("{}")
+  isActive    Boolean             @default(true) @map("is_active")
+  lastSyncAt  DateTime?           @map("last_sync_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  orders         Order[]
+  abandonedCarts AbandonedCart[]
+  metaAccounts   MetaAccount[]
+
+  @@unique([platform, name])
+  @@map("integration_configs")
+}
+
+model Order {
+  id                  String             @id @default(uuid())
+  shopifyOrderId      String?            @unique @map("shopify_order_id")
+  shopifyOrderNumber  String?            @map("shopify_order_number")
+  customerId          String             @map("customer_id")
+  customer            Customer           @relation(fields: [customerId], references: [id])
+  integrationId       String?            @map("integration_id")
+  integration         IntegrationConfig? @relation(fields: [integrationId], references: [id])
+  status              OrderStatus        @default(PENDING_CONFIRMATION)
+  totalAmount         Decimal            @map("total_amount") @db.Decimal(12, 2)
+  currency            String             @default("COP")
+  shippingAddress     Json?              @map("shipping_address")
+  trackingNumber      String?            @map("tracking_number")
+  mastershopGuideId   String?            @map("mastershop_guide_id")
+  estimatedDelivery   DateTime?          @map("estimated_delivery")
+  deliveredAt         DateTime?          @map("delivered_at")
+  // La clienta tocó "Confirmar" en la plantilla de WhatsApp. Mastershop no expone
+  // escritura de estado, así que la confirmación vive solo en el CRM.
+  confirmedAt         DateTime?          @map("confirmed_at")
+  notes               String?
+  items               Json               @default("[]")
+  statusHistory       Json               @default("[]") @map("status_history")
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  flowExecutions   FlowExecution[]
+  recoveredCarts   AbandonedCart[]
+  mastershopGuides MastershopGuide[]
+
+  @@map("orders")
+}
+
+model AbandonedCart {
+  id                String             @id @default(uuid())
+  shopifyCheckoutId String             @unique @map("shopify_checkout_id")
+  shopifyCartToken  String?            @map("shopify_cart_token")
+  customerId        String?            @map("customer_id")
+  customer          Customer?          @relation(fields: [customerId], references: [id])
+  integrationId     String?            @map("integration_id")
+  integration       IntegrationConfig? @relation(fields: [integrationId], references: [id])
+  email             String?
+  phone             String?
+  status            CartStatus         @default(OPEN)
+  checkoutUrl       String?            @map("checkout_url")
+  totalAmount       Decimal?           @map("total_amount") @db.Decimal(12, 2)
+  currency          String             @default("COP")
+  lineItems         Json               @default("[]") @map("line_items")
+  recoveredOrderId  String?            @map("recovered_order_id")
+  recoveredOrder    Order?             @relation(fields: [recoveredOrderId], references: [id])
+  reminderSentAt    DateTime?          @map("reminder_sent_at")
+  reminderCount     Int                @default(0) @map("reminder_count")
+  abandonedAt       DateTime           @default(now()) @map("abandoned_at")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  flowExecutions FlowExecution[]
+
+  @@map("abandoned_carts")
+}
+
+model MetaAccount {
+  id            String             @id @default(uuid())
+  integrationId String?            @map("integration_id")
+  integration   IntegrationConfig? @relation(fields: [integrationId], references: [id])
+  channel       CrmChannel
+  accountId     String             @map("account_id")
+  accountName   String?            @map("account_name")
+  phoneNumber   String?            @map("phone_number")
+  wabaId        String?            @map("waba_id")
+  pageId        String?            @map("page_id")
+  instagramId   String?            @map("instagram_id")
+  accessToken   String?            @map("access_token")
+  isActive      Boolean            @default(true) @map("is_active")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  conversations Conversation[]
+
+  @@unique([channel, accountId])
+  @@map("meta_accounts")
+}
+
+model MastershopGuide {
+  id              String    @id @default(uuid())
+  guideNumber     String    @unique @map("guide_number")
+  orderId         String?   @map("order_id")
+  order           Order?    @relation(fields: [orderId], references: [id])
+  customerId      String?   @map("customer_id")
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  carrier         String?
+  status          String    @default("CREATED")
+  statusDetail    String?   @map("status_detail")
+  originCity      String?   @map("origin_city")
+  destinationCity String?   @map("destination_city")
+  estimatedDate   DateTime? @map("estimated_date") @db.Date
+  deliveredAt     DateTime? @map("delivered_at")
+  events          Json      @default("[]")
+  rawData         Json      @default("{}") @map("raw_data")
+  lastSyncedAt    DateTime? @map("last_synced_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("mastershop_guides")
+}
+
+model Conversation {
+  id            String             @id @default(uuid())
+  customerId    String             @map("customer_id")
+  customer      Customer           @relation(fields: [customerId], references: [id])
+  metaAccountId String?            @map("meta_account_id")
+  metaAccount   MetaAccount?       @relation(fields: [metaAccountId], references: [id])
+  channel       CrmChannel
+  externalId    String?            @map("external_id")
+  status        ConversationStatus @default(OPEN)
+  assignedTo    String?            @map("assigned_to")
+  agent         CrmUser?           @relation(fields: [assignedTo], references: [id])
+  tags          String[]           @default([])
+  isRead        Boolean            @default(false) @map("is_read")
+  lastMessageAt DateTime?          @map("last_message_at")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String           @id @default(uuid())
+  conversationId String           @map("conversation_id")
+  conversation   Conversation     @relation(fields: [conversationId], references: [id])
+  direction      MessageDirection
+  content        String
+  contentType    String           @default("text") @map("content_type")
+  mediaUrl       String?          @map("media_url")
+  media          MessageMedia?
+  status         MessageStatus    @default(SENT)
+  externalId     String?          @map("external_id")
+  isInternal     Boolean          @default(false) @map("is_internal")
+  sentById       String?          @map("sent_by_id")
+  sentBy         CrmUser?         @relation("SentBy", fields: [sentById], references: [id])
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  @@map("messages")
+}
+
+// Archivos que manda la clienta por WhatsApp (fotos del cabello, audios, PDFs).
+// Se guardan en la BD porque el volumen del negocio es bajo y así no dependen de
+// credenciales de Storage. Si el volumen crece, mover `data` a un bucket y dejar
+// aquí solo la ruta: el resto del código no cambia.
+model MessageMedia {
+  id        String   @id @default(uuid())
+  messageId String   @unique @map("message_id")
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  mimeType  String   @map("mime_type")
+  filename  String?
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("message_media")
+}
+
+model MessageTemplate {
+  id             String           @id @default(uuid())
+  name           String
+  shortcut       String?          @unique
+  category       TemplateCategory
+  content        String
+  variables      String[]         @default([])
+  status         TemplateStatus   @default(PENDING)
+  channels       CrmChannel[]     @default([])
+  metaTemplateId String?          @map("meta_template_id")
+  language       String           @default("es")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+
+  @@map("message_templates")
+}
+
+model FlowTemplate {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  trigger     FlowTrigger
+  isActive    Boolean     @default(true) @map("is_active")
+  conditions  Json        @default("[]")
+  steps       Json        @default("[]")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  executions FlowExecution[]
+
+  @@map("flow_templates")
+}
+
+model FlowExecution {
+  id             String        @id @default(uuid())
+  flowTemplateId String        @map("flow_template_id")
+  flow           FlowTemplate  @relation(fields: [flowTemplateId], references: [id])
+  customerId     String        @map("customer_id")
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  orderId        String?       @map("order_id")
+  order          Order?        @relation(fields: [orderId], references: [id])
+  cartId         String?       @map("cart_id")
+  cart           AbandonedCart? @relation(fields: [cartId], references: [id])
+  currentStep    Int           @default(0) @map("current_step")
+  status         String        @default("running")
+  scheduledAt    DateTime?     @map("scheduled_at")
+  completedAt    DateTime?     @map("completed_at")
+  metadata       Json          @default("{}")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@map("flow_executions")
+}
+
+model WebhookEvent {
+  id          String              @id @default(uuid())
+  platform    IntegrationPlatform
+  eventType   String              @map("event_type")
+  status      WebhookEventStatus  @default(PENDING)
+  payload     Json                @default("{}")
+  headers     Json                @default("{}")
+  processedAt DateTime?           @map("processed_at")
+  error       String?
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  @@map("webhook_events")
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  userId     String?  @map("user_id")
+  user       CrmUser? @relation(fields: [userId], references: [id])
+  action     String
+  resource   String
+  resourceId String?  @map("resource_id") @db.Uuid
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("activity_logs")
+}

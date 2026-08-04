@@ -1,0 +1,29 @@
+# ── Secretos: nunca, bajo ninguna circunstancia ─────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Carpetas de trabajo local, fuera del repo ───────────────────────────────
+Copia de apps/
+Copia de recursos/
+Copia de src/
+Copia de skills-lock.json
+
+# ── Dependencias y build ────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Plataforma ──────────────────────────────────────────────────────────────
+.vercel
+
+# ── Sistema y editores ──────────────────────────────────────────────────────
+.DS_Store
+*.log
+npm-debug.log*
+.idea/
+.vscode/
