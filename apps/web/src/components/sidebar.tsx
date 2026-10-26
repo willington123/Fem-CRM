@@ -3,25 +3,32 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   MessageSquare, Users, ShoppingBag, BarChart3, Zap,
-  FileText, LogOut, Settings
+  FileText, LogOut, Settings, UsersRound, KeyRound
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { clearAuth, getUser, AuthUser } from '@/lib/auth';
+import { clearAuth } from '@/lib/auth';
+import { useCurrentUser } from '@/lib/use-current-user';
+import { ROLE_LABELS, Permission, Role } from '@/lib/permissions';
+import { ChangePasswordModal } from './change-password-modal';
 import { api } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
-/** `badge` nombra el contador de /api/stats/badges que le corresponde. */
-const navItems = [
+/**
+ * `badge` nombra el contador de /api/stats/badges que le corresponde.
+ * `perm` esconde la entrada a quien no la puede usar (la API igual lo bloquea).
+ */
+const navItems: { href: string; icon: any; label: string; badge: 'inbox' | 'orders' | null; perm?: Permission }[] = [
   { href: '/dashboard',       icon: BarChart3,     label: 'Dashboard',  badge: null },
   { href: '/inbox',           icon: MessageSquare, label: 'Bandeja',    badge: 'inbox'  as const },
   { href: '/customers',       icon: Users,         label: 'Clientas',   badge: null },
   { href: '/orders',          icon: ShoppingBag,   label: 'Pedidos',    badge: 'orders' as const },
   { href: '/flows',           icon: Zap,           label: 'Flujos',     badge: null },
   { href: '/templates',       icon: FileText,      label: 'Plantillas', badge: null },
-  { href: '/settings',        icon: Settings,      label: 'Ajustes',    badge: null },
+  { href: '/team',            icon: UsersRound,    label: 'Equipo',     badge: null, perm: 'team.manage' },
+  { href: '/settings',        icon: Settings,      label: 'Ajustes',    badge: null, perm: 'settings.view' },
 ];
 
 type Badges = { inbox: number; orders: number };
@@ -29,10 +36,10 @@ type Badges = { inbox: number; orders: number };
 export function Sidebar() {
   const pathname = usePathname();
   const router   = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const { user, can } = useCurrentUser();
+  const [changingPassword, setChangingPassword] = useState(false);
   const [badges, setBadges] = useState<Badges>({ inbox: 0, orders: 0 });
 
-  useEffect(() => { setUser(getUser()); }, []);
 
   // Los contadores se refrescan solos: el CRM se deja abierto todo el día.
   useEffect(() => {
@@ -71,7 +78,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ href, icon: Icon, label, badge }) => {
+        {navItems.filter(i => !i.perm || can(i.perm)).map(({ href, icon: Icon, label, badge }) => {
           const active = pathname === href || pathname.startsWith(href + '/');
           const count  = badge ? badges[badge] : 0;
           return (
@@ -109,10 +116,19 @@ export function Sidebar() {
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-ink truncate leading-none">{user?.name || 'Usuaria'}</p>
-            <p className="text-xs text-ink-muted capitalize mt-0.5">{user?.role?.toLowerCase() || 'agente'}</p>
+            <p className="text-xs text-ink-muted mt-0.5">{user?.role ? ROLE_LABELS[user.role as Role] : ''}</p>
           </div>
           <button
+            onClick={() => setChangingPassword(true)}
+            title="Cambiar mi contraseña"
+            aria-label="Cambiar mi contraseña"
+            className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded-lg hover:bg-brand-100"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-ink-muted" />
+          </button>
+          <button
             onClick={() => { clearAuth(); router.push('/login'); }}
+            aria-label="Cerrar sesión"
             title="Cerrar sesión"
             className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 rounded-lg hover:bg-brand-100"
           >
@@ -120,6 +136,7 @@ export function Sidebar() {
           </button>
         </div>
       </div>
+      {changingPassword && <ChangePasswordModal onClose={() => setChangingPassword(false)} />}
     </aside>
   );
 }

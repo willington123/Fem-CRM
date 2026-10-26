@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { newOrderNumber, recalcCustomer } from '@/services/orders';
 import { runStep } from '@/services/order-flow';
@@ -42,7 +43,7 @@ interface ItemInput { name: string; quantity: number; price: number }
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
-  if (user.role === 'ANALYST') return forbidden();
+  if (!can(user.role, 'orders.edit')) return forbidden();
 
   const body = await req.json().catch(() => null);
   if (!body) return bad('Datos del pedido no válidos');

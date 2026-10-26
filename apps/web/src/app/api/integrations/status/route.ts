@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { PLATFORMS, inspectPlatform } from '@/lib/integrations';
 
@@ -13,7 +14,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
-  if (user.role !== 'ADMIN') return forbidden();
+  if (!can(user.role, 'settings.view')) return forbidden();
 
   const platforms = PLATFORMS.map(inspectPlatform);
 

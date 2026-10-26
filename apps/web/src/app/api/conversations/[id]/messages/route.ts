@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { sendWhatsAppMessage, sendWhatsAppTemplate } from '@/services/whatsapp';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
-  if (user.role === 'ANALYST') return forbidden();
+  if (!can(user.role, 'inbox.reply')) return forbidden();
 
   const { content, contentType = 'text', isInternal = false, template } = await req.json();
   // template opcional: { name, language?, params?[] } → se envía como plantilla real (válida fuera de la ventana de 24h)

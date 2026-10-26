@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser, unauthorized } from '@/lib/auth-server';
+import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { createMetaTemplate } from '@/services/whatsapp';
 
@@ -65,6 +66,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
+  if (!can(user.role, 'templates.manage')) return forbidden();
 
   const input = await req.json().catch(() => null);
   if (!input) return NextResponse.json({ error: 'Solicitud inválida.' }, { status: 400 });

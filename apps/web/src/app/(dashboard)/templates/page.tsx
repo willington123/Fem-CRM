@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { TemplateFormModal } from '@/components/template-form-modal';
+import { useCurrentUser } from '@/lib/use-current-user';
 
 const CATEGORY_LABELS: Record<string, string> = {
   CONFIRMATION: 'Confirmación',
@@ -55,6 +56,8 @@ export default function TemplatesPage() {
   const [filterCategory, setFilterCategory] = useState('');
   const [copied, setCopied] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const { can } = useCurrentUser();
+  const canManage = can('templates.manage');
 
   const load = () => api.get<Template[]>('/api/templates').then(setTemplates).catch(() => {});
 
@@ -94,7 +97,7 @@ export default function TemplatesPage() {
             <h1 className="text-xl font-bold text-ink">Plantillas de mensajes</h1>
             <p className="text-sm text-muted-foreground">{templates.length} plantillas · {templates.filter(t => t.status === 'APPROVED').length} aprobadas</p>
           </div>
-          <div className="flex items-center gap-2">
+          {canManage && <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" className="gap-2" onClick={syncWithMeta} disabled={syncing}>
               <RefreshCw className={cn('w-4 h-4', syncing && 'animate-spin')} />
               {syncing ? 'Sincronizando…' : 'Sincronizar con WhatsApp'}
@@ -102,7 +105,7 @@ export default function TemplatesPage() {
             <Button size="sm" className="gap-2" onClick={() => setShowForm(true)}>
               <Plus className="w-4 h-4" /> Nueva plantilla
             </Button>
-          </div>
+          </div>}
         </div>
         <div className="flex items-center gap-3 mt-4">
           <div className="relative flex-1 max-w-sm">
@@ -140,7 +143,7 @@ export default function TemplatesPage() {
           <p className="text-ink-muted text-sm font-medium">
             {loading ? 'Cargando plantillas…' : 'No hay plantillas todavía'}
           </p>
-          {!loading && (
+          {!loading && canManage && (
             <Button size="sm" className="gap-2 mt-4" onClick={() => setShowForm(true)}>
               <Plus className="w-4 h-4" /> Crear la primera plantilla
             </Button>

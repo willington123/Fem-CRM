@@ -3,20 +3,7 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/prisma';
 import { createServerSupabase } from '@/lib/supabase-server';
 import { getJwtSecret } from '@/lib/secrets';
-
-/**
- * Vista previa local sin Supabase.
- *
- * Existe solo para poder abrir el CRM con datos de demostración antes de tener
- * el proyecto de Supabase. Exige DOS condiciones a la vez, y la segunda es la
- * que lo vuelve inofensivo: la base de datos tiene que estar en la máquina.
- * En Vercel, con Supabase apuntando a un host remoto, esto nunca se activa
- * aunque alguien ponga la variable por error.
- */
-function devLoginAllowed(): boolean {
-  if (process.env.ALLOW_DEV_LOGIN !== 'true') return false;
-  return /@(localhost|127\.0\.0\.1)[:/]/.test(process.env.DATABASE_URL ?? '');
-}
+import { devLoginAllowed } from '@/lib/dev-login';
 
 function issue(user: { id: string; email: string; role: string; name: string; avatar: string | null }) {
   const token = jwt.sign(
@@ -38,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (devLoginAllowed()) {
-      const user = await prisma.crmUser.findFirst({ where: { email } });
+      const user = await prisma.crmUser.findFirst({ where: { email: { equals: email, mode: 'insensitive' } } });
       if (!user || !user.isActive) {
         return NextResponse.json({ error: 'Credenciales inválidas' }, { status: 401 });
       }
@@ -53,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     const user = await prisma.crmUser.findFirst({
-      where: { OR: [{ authUserId: authData.user.id }, { email }] },
+      where: { OR: [{ authUserId: authData.user.id }, { email: { equals: email, mode: 'insensitive' } }] },
     });
     if (!user || !user.isActive) {
       return NextResponse.json({ error: 'Usuario no activo en el CRM' }, { status: 401 });

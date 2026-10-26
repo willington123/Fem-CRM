@@ -28,8 +28,9 @@ export const STATUS_ORDER = [
 /** Estados en los que el mensaje cita la guía. */
 const NEEDS_GUIDE = ['DISPATCHED', 'IN_TRANSIT', 'IN_DESTINATION'];
 
-export function OrderUpdateModal({ order, onClose, onSaved }: {
+export function OrderUpdateModal({ order, onClose, onSaved, readOnly = false }: {
   order: OrderDetail;
+  readOnly?: boolean;
   onClose: () => void;
   onSaved: (o: OrderDetail) => void;
 }) {
@@ -106,6 +107,7 @@ export function OrderUpdateModal({ order, onClose, onSaved }: {
             <select
               value={status}
               onChange={e => { setStatus(e.target.value); setResult(null); }}
+              disabled={readOnly}
               className="mt-1 w-full h-9 rounded-lg border border-input bg-background px-3 text-sm"
             >
               {STATUS_ORDER.map(s => <option key={s} value={s}>{ORDER_STATUS_LABELS[s]}</option>)}
@@ -115,11 +117,11 @@ export function OrderUpdateModal({ order, onClose, onSaved }: {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-sm font-medium text-ink-soft">Número de guía</label>
-              <Input value={guide} onChange={e => { setGuide(e.target.value); setResult(null); }} className="mt-1" placeholder="Ej. 240110000123" />
+              <Input value={guide} disabled={readOnly} onChange={e => { setGuide(e.target.value); setResult(null); }} className="mt-1" placeholder="Ej. 240110000123" />
             </div>
             <div>
               <label className="text-sm font-medium text-ink-soft">Transportadora</label>
-              <Input value={carrier} onChange={e => { setCarrier(e.target.value); setResult(null); }} className="mt-1" placeholder="Ej. Servientrega" list="carriers" />
+              <Input value={carrier} disabled={readOnly} onChange={e => { setCarrier(e.target.value); setResult(null); }} className="mt-1" placeholder="Ej. Servientrega" list="carriers" />
               <datalist id="carriers">
                 {['Servientrega', 'Interrapidísimo', 'Coordinadora', 'Envía', 'TCC', 'Deprisa'].map(c => <option key={c} value={c} />)}
               </datalist>
@@ -150,14 +152,14 @@ export function OrderUpdateModal({ order, onClose, onSaved }: {
           <button onClick={onClose} className="px-4 h-10 rounded-xl border border-brand-200 text-sm font-semibold text-ink-soft hover:bg-brand-50">
             Cerrar
           </button>
-          <button
+          {!readOnly && <button
             onClick={save}
             disabled={saving || unchanged}
             className={cn('px-5 h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 disabled:opacity-50 text-white text-sm font-semibold flex items-center gap-2')}
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             Guardar
-          </button>
+          </button>}
         </div>
       </div>
     </div>

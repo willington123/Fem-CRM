@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser, unauthorized } from '@/lib/auth-server';
+import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
+  if (!can(user.role, 'flows.manage')) return forbidden();
 
   const current = await prisma.flowTemplate.findUnique({ where: { id: params.id } });
   if (!current) return NextResponse.json({ error: 'Flujo no encontrado' }, { status: 404 });

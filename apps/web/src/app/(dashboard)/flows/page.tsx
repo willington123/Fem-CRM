@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { useCurrentUser } from '@/lib/use-current-user';
 
 // Etiqueta e icono por tipo de disparador (enum FlowTrigger)
 const TRIGGERS: Record<string, { label: string; icon: typeof Zap; color: string }> = {
@@ -40,6 +41,8 @@ export default function FlowsPage() {
   const [flows, setFlows]     = useState<Flow[]>([]);
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
+  const { can } = useCurrentUser();
+  const canManage = can('flows.manage');
 
   const load = () =>
     api.get<Flow[]>('/api/flows')
@@ -140,7 +143,9 @@ export default function FlowsPage() {
                   <span className="text-[10px] text-[#8C6B66]">{flow.isActive ? 'Activo' : 'Pausado'}</span>
                   <button
                     onClick={() => toggleFlow(flow.id)}
-                    disabled={toggling === flow.id}
+                    disabled={toggling === flow.id || !canManage}
+                    title={canManage ? undefined : 'Solo Administración puede encender o apagar flujos'}
+                    aria-label={`${flow.isActive ? 'Apagar' : 'Encender'} ${flow.name}`}
                     className={cn('w-10 h-6 rounded-full transition-colors relative disabled:opacity-50', flow.isActive ? 'bg-pepper-600' : 'bg-[#DBDBDB]')}
                   >
                     <span className={cn('absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform', flow.isActive ? 'translate-x-5' : 'translate-x-1')} />

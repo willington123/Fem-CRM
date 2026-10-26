@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import type { PlatformKey } from '@/lib/integrations';
 
@@ -89,7 +90,7 @@ const TESTS: Record<PlatformKey, () => Promise<TestResult>> = {
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
-  if (user.role !== 'ADMIN') return forbidden();
+  if (!can(user.role, 'settings.view')) return forbidden();
 
   const { platform } = await req.json().catch(() => ({ platform: null }));
   const run = TESTS[platform as PlatformKey];

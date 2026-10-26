@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OrderStatus } from '@prisma/client';
 import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { appendStatusHistory, recalcCustomer } from '@/services/orders';
 import { runStep, stepForStatus } from '@/services/order-flow';
@@ -14,7 +15,7 @@ const VALID = new Set<string>(Object.values(OrderStatus));
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
-  if (user.role === 'ANALYST') return forbidden();
+  if (!can(user.role, 'orders.edit')) return forbidden();
 
   const body = await req.json().catch(() => ({}));
   const status: string = body.status;

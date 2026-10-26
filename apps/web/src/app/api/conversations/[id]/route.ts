@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser, unauthorized } from '@/lib/auth-server';
+import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { signMediaToken } from '@/services/media';
 
@@ -38,8 +39,19 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
+  if (!can(user.role, 'inbox.reply')) return forbidden();
 
   const { status, assignedTo, tags } = await req.json();
+
+  if (status !== undefined && !['OPEN', 'IN_PROGRESS', 'RESOLVED'].includes(status)) {
+    return NextResponse.json({ error: 'Estado no válido' }, { status: 400 });
+  }
+  // Solo se asigna a alguien del equipo que esté activo (null = sin asignar).
+  if (assignedTo) {
+    const agent = await prisma.crmUser.findUnique({ where: { id: String(assignedTo) } });
+    if (!agent?.isActive) return NextResponse.json({ error: 'Esa persona no está activa en el equipo' }, { status: 400 });
+  }
+
   const conversation = await prisma.conversation.update({
     where: { id: params.id },
     data: { status, assignedTo, tags },

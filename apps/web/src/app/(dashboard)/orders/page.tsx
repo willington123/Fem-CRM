@@ -5,6 +5,7 @@ import { Package, Clock, MapPin, Search, Pencil } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { OrderUpdateModal, OrderDetail, STATUS_ORDER } from '@/components/order-update-modal';
 import { api } from '@/lib/api';
+import { useCurrentUser } from '@/lib/use-current-user';
 import { cn, formatCOP, formatRelativeTime, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/lib/utils';
 
 const COLUMN_COLOR: Record<string, string> = {
@@ -24,7 +25,7 @@ const COLUMN_COLOR: Record<string, string> = {
 const initials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 const orderLabel = (o: OrderDetail) => o.orderNumber || o.id.slice(0, 8);
 
-function OrderCard({ order, onOpen }: { order: OrderDetail; onOpen: () => void }) {
+function OrderCard({ order, onOpen, canEdit }: { order: OrderDetail; onOpen: () => void; canEdit: boolean }) {
   return (
     <div className="bg-white rounded-xl border border-brand-100 p-4 hover:shadow-md transition-shadow space-y-3">
       <div className="flex items-start justify-between gap-2">
@@ -62,7 +63,7 @@ function OrderCard({ order, onOpen }: { order: OrderDetail; onOpen: () => void }
         onClick={onOpen}
         className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs border border-brand-100 rounded-lg hover:bg-brand-50 transition-colors text-ink-soft font-semibold"
       >
-        <Pencil className="w-3 h-3" /> Actualizar
+        <Pencil className="w-3 h-3" /> {canEdit ? 'Actualizar' : 'Ver detalle'}
       </button>
     </div>
   );
@@ -74,6 +75,8 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch]   = useState('');
   const [open, setOpen]       = useState<OrderDetail | null>(null);
+  const { can } = useCurrentUser();
+  const canEdit = can('orders.edit');
 
   useEffect(() => {
     api.get<{ data: OrderDetail[] }>('/api/orders?limit=1000')
@@ -158,7 +161,7 @@ export default function OrdersPage() {
                 </div>
                 <div className="flex-1 space-y-3 overflow-y-auto pr-1">
                   {grouped[key]?.map(order => (
-                    <OrderCard key={order.id} order={order} onOpen={() => setOpen(order)} />
+                    <OrderCard key={order.id} order={order} onOpen={() => setOpen(order)} canEdit={canEdit} />
                   ))}
                   {grouped[key]?.length === 0 && (
                     <div className="text-center py-8 text-ink-muted text-xs">Sin pedidos</div>
@@ -211,7 +214,7 @@ export default function OrdersPage() {
         </div>
       )}
 
-      {open && <OrderUpdateModal order={open} onClose={() => setOpen(null)} onSaved={handleSaved} />}
+      {open && <OrderUpdateModal order={open} onClose={() => setOpen(null)} onSaved={handleSaved} readOnly={!canEdit} />}
     </div>
   );
 }

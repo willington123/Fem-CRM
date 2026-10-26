@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUser, unauthorized } from '@/lib/auth-server';
+import { getAuthUser, unauthorized, forbidden } from '@/lib/auth-server';
+import { can } from '@/lib/permissions';
 import { prisma } from '@/lib/prisma';
 import { fetchMetaTemplates } from '@/services/whatsapp';
 
@@ -23,6 +24,7 @@ const STATUS_MAP: Record<string, 'APPROVED' | 'PENDING' | 'REJECTED'> = {
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) return unauthorized();
+  if (!can(user.role, 'inbox.reply')) return forbidden();
 
   let metaTemplates;
   try {
