@@ -120,7 +120,7 @@ export default function TemplatesPage() {
           <div className="flex gap-1.5">
             <button
               onClick={() => setFilterCategory('')}
-              className={cn('px-3 py-1.5 rounded-lg text-xs font-medium border transition-all', !filterCategory ? 'bg-pepper-600 text-white border-pepper-600' : 'bg-white text-ink-soft border-brand-100')}
+              className={cn('px-3 py-1.5 rounded-lg text-xs font-medium border transition-all', !filterCategory ? 'bg-action-600 text-white border-action-600' : 'bg-white text-ink-soft border-brand-100')}
             >
               Todas
             </button>
@@ -128,7 +128,7 @@ export default function TemplatesPage() {
               <button
                 key={key}
                 onClick={() => setFilterCategory(filterCategory === key ? '' : key)}
-                className={cn('px-3 py-1.5 rounded-lg text-xs font-medium border transition-all', filterCategory === key ? 'bg-pepper-600 text-white border-pepper-600' : 'bg-white text-ink-soft border-brand-100 hover:border-brand-200')}
+                className={cn('px-3 py-1.5 rounded-lg text-xs font-medium border transition-all', filterCategory === key ? 'bg-action-600 text-white border-action-600' : 'bg-white text-ink-soft border-brand-100 hover:border-brand-200')}
               >
                 {label}
               </button>
@@ -181,7 +181,7 @@ export default function TemplatesPage() {
 
                 <h3 className="font-semibold text-ink text-sm mb-1">{template.name}</h3>
                 {template.shortcut && (
-                  <code className="text-xs bg-brand-50 text-pepper-600 px-1.5 py-0.5 rounded font-mono mb-2 inline-block">
+                  <code className="text-xs bg-brand-50 text-action-600 px-1.5 py-0.5 rounded font-mono mb-2 inline-block">
                     {template.shortcut}
                   </code>
                 )}

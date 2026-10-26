@@ -1,6 +1,6 @@
-# Fem CRM
+# Konnexa
 
-CRM omnicanal de Fem: bandeja de WhatsApp / Instagram / Facebook, seguimiento de
+CRM conversacional: bandeja de WhatsApp / Instagram / Facebook, seguimiento de
 pedidos tomados por WhatsApp, flujos automáticos de mensajes y analítica.
 
 Next.js 14 (App Router) · Prisma · PostgreSQL en Supabase · Tailwind · desplegado en Vercel.
@@ -14,7 +14,7 @@ cd apps/web
 npm install
 cp .env.example .env.local     # y rellena los valores (ver sección 2)
 npm run db:push                # crea las tablas en Supabase
-npm run seed:admin hola@fem.com.co "Tu Nombre" 'unaClaveLarga'
+npm run seed:admin tu@correo.com "Tu Nombre" 'unaClaveLarga'
 npm run seed:flows             # crea los 8 pasos del flujo de pedido, APAGADOS
 npm run dev                    # http://localhost:3000
 ```
@@ -38,7 +38,7 @@ npm run preview            # o `npm run preview -- --reset` para resembrar
 
 Levanta un Postgres propio en el puerto 55432, siembra clientas, pedidos y
 conversaciones de mentira, y abre <http://localhost:3111>. Entras con
-`hola@fem.com.co` y cualquier contraseña.
+`hola@konnexa.app` y cualquier contraseña.
 
 Ese atajo es `ALLOW_DEV_LOGIN`, y **solo se activa si `DATABASE_URL` apunta a
 localhost** (`src/app/api/auth/login/route.ts:16`). En Vercel, con Supabase en un
@@ -108,22 +108,22 @@ pedidos históricos.
 
 ## 4 · Identidad de marca
 
-Definida en `tailwind.config.ts` y `src/app/globals.css`, siguiendo el manual:
+Definida en `tailwind.config.ts` y `src/app/globals.css`, a partir del logo:
 
-- **Rosa Melocotón `#FF9DA3`** — escala `brand-*`. Es el 70 %: superficies,
-  tintes, bordes, fondos.
-- **Rojo Pimiento `#ED5340`** — escala `pepper-*`. Es el 30 %: acciones, estado
-  activo, series de datos.
-- **Tinta `#2E1614`** — escala `ink-*` para el texto.
+- **Azul Konnexa `#015EF7`**: escala `action-*`. Botones, estado activo, enlaces
+  y series de datos. Con texto blanco encima se usa `action-600` (`#0050D6`, 7:1).
+- **Azules claros**: escala `brand-*`. Superficies, tintes, bordes y avatares.
+- **Verde Konnexa `#0ACA62`**: escala `mint-*`. Acento puntual y degradados. No
+  lleva texto pequeño encima (2.3:1 con blanco); para texto verde, `mint-700`.
+- **Azul marino `#0B1630`**: escala `ink-*` para el texto.
+- **Errores en rojo** (`rose-*` de Tailwind): nunca con el color de marca.
 
-Los colores de marca puros no alcanzan contraste AA con texto blanco
-(`#FF9DA3` = 1.98:1, `#ED5340` = 3.55:1), así que **todo lo que lleve texto
-encima usa `pepper-600` (4.77:1) o `pepper-700` (6.50:1)**, que son los pasos
-«Dark» que el propio manual contempla. El rosa puro se reserva para áreas sin
-texto pequeño encima.
+Logo en `public/konnexa-logo.png` (fondos claros), `public/konnexa-logo-white.png`
+(fondos oscuros) y `public/konnexa-icon.png` (solo la K). Se regeneran desde el
+original con `python3 scripts/make-logo-assets.py ruta/al/logo.webp`.
 
 Tipografía: Montserrat para texto corrido y Montserrat Alternates para titulares,
-ambas servidas en local desde `public/fonts`.
+servidas en local desde `public/fonts`.
 
 ---
 

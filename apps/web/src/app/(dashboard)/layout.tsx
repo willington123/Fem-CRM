@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [router]);
 
   return (
-    <div className="flex h-screen bg-[#FFF8F7]">
+    <div className="flex h-screen bg-[#F6F8FC]">
       <Sidebar />
       <main className="flex-1 ml-[215px] overflow-hidden flex flex-col">
         {children}

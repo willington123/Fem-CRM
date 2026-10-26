@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   if (!user) return unauthorized();
 
   if (user.id === 'demo') {
-    return NextResponse.json({ id: 'demo', name: 'Demo Admin', email: 'admin@fem.com.co', role: 'ADMIN' });
+    return NextResponse.json({ id: 'demo', name: 'Demo Admin', email: 'demo@konnexa.app', role: 'ADMIN' });
   }
 
   const dbUser = await prisma.crmUser.findUnique({

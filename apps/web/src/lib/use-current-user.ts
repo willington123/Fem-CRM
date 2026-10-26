@@ -18,7 +18,7 @@ export function useCurrentUser() {
       .then(fresh => {
         if (!fresh) return;
         setUser(fresh);
-        try { localStorage.setItem('fem_user', JSON.stringify(fresh)); } catch {}
+        try { localStorage.setItem('konnexa_user', JSON.stringify(fresh)); } catch {}
       })
       .catch(() => {});
   }, []);

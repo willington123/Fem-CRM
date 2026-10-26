@@ -10,14 +10,14 @@ import { useCurrentUser } from '@/lib/use-current-user';
 
 // Etiqueta e icono por tipo de disparador (enum FlowTrigger)
 const TRIGGERS: Record<string, { label: string; icon: typeof Zap; color: string }> = {
-  ORDER_CREATED:       { label: 'Pedido creado',          icon: ShoppingCart, color: 'text-pepper-600' },
+  ORDER_CREATED:       { label: 'Pedido creado',          icon: ShoppingCart, color: 'text-action-600' },
   ORDER_CONFIRMED:     { label: 'Pedido confirmado',      icon: CheckCircle,  color: 'text-blue-500' },
   ORDER_DISPATCHED:    { label: 'Pedido despachado',      icon: Truck,        color: 'text-violet-500' },
   ORDER_DELIVERED:     { label: 'Pedido entregado',       icon: PackageCheck, color: 'text-emerald-500' },
   ORDER_RETURNED:      { label: 'Pedido devuelto',        icon: PackageX,     color: 'text-red-500' },
   DAYS_AFTER_DELIVERY: { label: 'Días tras la entrega',   icon: Clock,        color: 'text-teal-500' },
   NO_REPURCHASE_DAYS:  { label: 'Días sin recompra',      icon: RotateCcw,    color: 'text-orange-500' },
-  MESSAGE_RECEIVED:    { label: 'Mensaje recibido',       icon: MessageSquare,color: 'text-pepper-600' },
+  MESSAGE_RECEIVED:    { label: 'Mensaje recibido',       icon: MessageSquare,color: 'text-action-600' },
   KEYWORD_RECEIVED:    { label: 'Palabra clave recibida', icon: Hash,         color: 'text-pink-500' },
   ABANDONED_CART:      { label: 'Carrito abandonado',     icon: Package,      color: 'text-amber-500' },
   ORDER_IN_TRANSIT:       { label: 'Pedido en tránsito',    icon: Truck,        color: 'text-violet-500' },
@@ -69,18 +69,18 @@ export default function FlowsPage() {
   const stepCount = (steps: unknown) => Array.isArray(steps) ? steps.length : 0;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#FFF8F7]">
+    <div className="flex-1 overflow-auto bg-[#F6F8FC]">
 
       {/* Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-[#F7E4E2] px-8 py-4 z-10">
+      <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-[#E3E9F4] px-8 py-4 z-10">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[17px] font-bold text-[#2E1614]">Flujos automáticos</h1>
-            <p className="text-xs text-[#8C6B66] mt-0.5">
+            <h1 className="text-[17px] font-bold text-[#0B1630]">Flujos automáticos</h1>
+            <p className="text-xs text-[#66728C] mt-0.5">
               {loading ? 'Cargando…' : `${flows.length} flujo${flows.length === 1 ? '' : 's'} · ${activeCount} activo${activeCount === 1 ? '' : 's'}`}
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-pepper-600 hover:bg-pepper-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors shadow-sm">
+          <button className="flex items-center gap-2 bg-action-600 hover:bg-action-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors shadow-sm">
             <Plus className="w-3.5 h-3.5" /> Nuevo flujo
           </button>
         </div>
@@ -89,36 +89,36 @@ export default function FlowsPage() {
       <div className="p-8 space-y-3 max-w-3xl">
 
         {loading && (
-          <div className="flex items-center justify-center py-20 text-[#C6A5A2]">
+          <div className="flex items-center justify-center py-20 text-[#A3ADC2]">
             <Loader2 className="w-5 h-5 animate-spin" />
           </div>
         )}
 
         {/* Estado vacío honesto: no hay motor de flujos configurado todavía */}
         {!loading && flows.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-2xl border border-[#F7E4E2]">
+          <div className="text-center py-16 bg-white rounded-2xl border border-[#E3E9F4]">
             <div className="w-12 h-12 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-6 h-6 text-pepper-600" />
+              <Zap className="w-6 h-6 text-action-600" />
             </div>
-            <p className="font-bold text-[15px] text-[#2E1614]">Aún no hay flujos automáticos</p>
-            <p className="text-xs text-[#8C6B66] mt-1.5 max-w-md mx-auto leading-relaxed">
+            <p className="font-bold text-[15px] text-[#0B1630]">Aún no hay flujos automáticos</p>
+            <p className="text-xs text-[#66728C] mt-1.5 max-w-md mx-auto leading-relaxed">
               Los flujos permiten enviar mensajes automáticos según eventos: confirmar un pedido
               contra entrega, avisar el número de guía, o invitar a la recompra unos días después
               de entregado. Crea el primero para empezar a automatizar.
             </p>
-            <button className="inline-flex items-center gap-2 mt-5 bg-pepper-600 hover:bg-pepper-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors">
+            <button className="inline-flex items-center gap-2 mt-5 bg-action-600 hover:bg-action-700 text-white px-4 py-2 rounded-xl text-xs font-semibold transition-colors">
               <Plus className="w-3.5 h-3.5" /> Crear primer flujo
             </button>
           </div>
         )}
 
         {!loading && flows.map(flow => {
-          const t = TRIGGERS[flow.trigger] ?? { label: flow.trigger, icon: Zap, color: 'text-[#8C6B66]' };
+          const t = TRIGGERS[flow.trigger] ?? { label: flow.trigger, icon: Zap, color: 'text-[#66728C]' };
           return (
             <div
               key={flow.id}
               className={cn(
-                'bg-white rounded-2xl border border-[#F7E4E2] p-5 flex items-center gap-4 transition-all',
+                'bg-white rounded-2xl border border-[#E3E9F4] p-5 flex items-center gap-4 transition-all',
                 !flow.isActive && 'opacity-60'
               )}
             >
@@ -126,27 +126,27 @@ export default function FlowsPage() {
                 <t.icon className={cn('w-5 h-5', t.color)} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-[14px] text-[#2E1614]">{flow.name}</p>
+                <p className="font-bold text-[14px] text-[#0B1630]">{flow.name}</p>
                 {flow.description && (
-                  <p className="text-[11px] text-[#8C6B66] mt-1 leading-relaxed">{flow.description}</p>
+                  <p className="text-[11px] text-[#66728C] mt-1 leading-relaxed">{flow.description}</p>
                 )}
-                <p className="text-[11px] text-[#8C6B66] mt-1">
+                <p className="text-[11px] text-[#66728C] mt-1">
                   Disparador: {t.label}{stepCount(flow.steps) > 0 && ` · ${stepCount(flow.steps)} paso${stepCount(flow.steps) === 1 ? '' : 's'}`}
                 </p>
               </div>
               <div className="flex items-center gap-6">
                 <div className="text-right">
-                  <p className="text-[10px] text-[#8C6B66]">Ejecuciones</p>
-                  <p className="font-bold text-[#2E1614] text-[15px]">{flow._count.executions}</p>
+                  <p className="text-[10px] text-[#66728C]">Ejecuciones</p>
+                  <p className="font-bold text-[#0B1630] text-[15px]">{flow._count.executions}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-[10px] text-[#8C6B66]">{flow.isActive ? 'Activo' : 'Pausado'}</span>
+                  <span className="text-[10px] text-[#66728C]">{flow.isActive ? 'Activo' : 'Pausado'}</span>
                   <button
                     onClick={() => toggleFlow(flow.id)}
                     disabled={toggling === flow.id || !canManage}
                     title={canManage ? undefined : 'Solo Administración puede encender o apagar flujos'}
                     aria-label={`${flow.isActive ? 'Apagar' : 'Encender'} ${flow.name}`}
-                    className={cn('w-10 h-6 rounded-full transition-colors relative disabled:opacity-50', flow.isActive ? 'bg-pepper-600' : 'bg-[#DBDBDB]')}
+                    className={cn('w-10 h-6 rounded-full transition-colors relative disabled:opacity-50', flow.isActive ? 'bg-action-600' : 'bg-[#DBDBDB]')}
                   >
                     <span className={cn('absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform', flow.isActive ? 'translate-x-5' : 'translate-x-1')} />
                   </button>

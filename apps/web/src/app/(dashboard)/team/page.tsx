@@ -84,7 +84,7 @@ function Credentials({ email, password, existing, onDone }: { email: string; pas
           </div>
         </>
       )}
-      <button onClick={onDone} className="w-full h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 text-white text-sm font-semibold">
+      <button onClick={onDone} className="w-full h-10 rounded-xl bg-action-600 hover:bg-action-700 text-white text-sm font-semibold">
         Listo
       </button>
     </div>
@@ -126,7 +126,7 @@ function AddMemberModal({ onClose, onCreated }: { onClose: () => void; onCreated
           </div>
           <div>
             <label className="text-sm font-medium text-ink-soft">Correo</label>
-            <Input type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1" placeholder="nombre@fem.com.co" />
+            <Input type="email" value={email} onChange={e => setEmail(e.target.value)} className="mt-1" placeholder="nombre@tuempresa.com" />
           </div>
           <div>
             <p className="text-sm font-medium text-ink-soft mb-1.5">Rol</p>
@@ -134,9 +134,9 @@ function AddMemberModal({ onClose, onCreated }: { onClose: () => void; onCreated
               {ROLES.map(r => (
                 <label key={r} className={cn(
                   'flex gap-3 items-start rounded-xl border px-3 py-2 cursor-pointer transition-colors',
-                  role === r ? 'border-pepper-500 bg-brand-50' : 'border-brand-100 hover:bg-brand-50',
+                  role === r ? 'border-action-500 bg-brand-50' : 'border-brand-100 hover:bg-brand-50',
                 )}>
-                  <input type="radio" name="role" checked={role === r} onChange={() => setRole(r)} className="mt-1 accent-[#D33A22]" />
+                  <input type="radio" name="role" checked={role === r} onChange={() => setRole(r)} className="mt-1 accent-[#0050D6]" />
                   <span>
                     <span className="block text-sm font-semibold text-ink">{ROLE_LABELS[r]}</span>
                     <span className="block text-xs text-ink-muted">{ROLE_DESCRIPTIONS[r]}</span>
@@ -154,8 +154,8 @@ function AddMemberModal({ onClose, onCreated }: { onClose: () => void; onCreated
               </button>
             </div>
           </div>
-          {error && <p className="text-sm text-pepper-700 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0 mt-px" /> {error}</p>}
-          <button onClick={submit} disabled={saving} className="w-full h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center justify-center gap-2">
+          {error && <p className="text-sm text-rose-700 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0 mt-px" /> {error}</p>}
+          <button onClick={submit} disabled={saving} className="w-full h-10 rounded-xl bg-action-600 hover:bg-action-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center justify-center gap-2">
             {saving && <Loader2 className="w-4 h-4 animate-spin" />} Agregar
           </button>
         </div>
@@ -196,8 +196,8 @@ function ResetPasswordModal({ member, onClose }: { member: Member; onClose: () =
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
           </div>
-          {error && <p className="text-sm text-pepper-700 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0 mt-px" /> {error}</p>}
-          <button onClick={submit} disabled={saving} className="w-full h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center justify-center gap-2">
+          {error && <p className="text-sm text-rose-700 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0 mt-px" /> {error}</p>}
+          <button onClick={submit} disabled={saving} className="w-full h-10 rounded-xl bg-action-600 hover:bg-action-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center justify-center gap-2">
             {saving && <Loader2 className="w-4 h-4 animate-spin" />} Guardar contraseña nueva
           </button>
         </div>
@@ -244,9 +244,9 @@ export default function TeamPage() {
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#FFF8F7] p-8">
+      <div className="flex-1 flex items-center justify-center bg-[#F6F8FC] p-8">
         <div className="text-center max-w-sm">
-          <AlertTriangle className="w-8 h-8 text-pepper-600 mx-auto mb-3" />
+          <AlertTriangle className="w-8 h-8 text-rose-600 mx-auto mb-3" />
           <p className="font-semibold text-ink">No se pudo abrir Equipo</p>
           <p className="text-sm text-ink-muted mt-1">{error}</p>
         </div>
@@ -257,15 +257,15 @@ export default function TeamPage() {
   const activos = members?.filter(m => m.isActive).length ?? 0;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#FFF8F7]">
-      <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-[#F7E4E2] px-8 py-4 z-10 flex items-center justify-between">
+    <div className="flex-1 overflow-auto bg-[#F6F8FC]">
+      <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-[#E3E9F4] px-8 py-4 z-10 flex items-center justify-between">
         <div>
           <h1 className="text-[17px] font-bold text-ink">Equipo</h1>
           <p className="text-xs text-ink-muted mt-0.5">
             {members ? `${activos} persona${activos === 1 ? '' : 's'} activa${activos === 1 ? '' : 's'}` : 'Cargando…'} · quién entra al CRM y qué puede hacer
           </p>
         </div>
-        <button onClick={() => setAdding(true)} className="flex items-center gap-2 bg-pepper-600 hover:bg-pepper-700 text-white px-3.5 h-9 rounded-xl text-sm font-semibold">
+        <button onClick={() => setAdding(true)} className="flex items-center gap-2 bg-action-600 hover:bg-action-700 text-white px-3.5 h-9 rounded-xl text-sm font-semibold">
           <UserPlus className="w-4 h-4" /> Agregar persona
         </button>
       </div>
@@ -277,7 +277,7 @@ export default function TeamPage() {
             const Icon = ROLE_ICON[r];
             return (
               <div key={r} className="bg-white border border-brand-100 rounded-2xl p-4">
-                <p className="flex items-center gap-2 text-sm font-bold text-ink"><Icon className="w-4 h-4 text-pepper-600" /> {ROLE_LABELS[r]}</p>
+                <p className="flex items-center gap-2 text-sm font-bold text-ink"><Icon className="w-4 h-4 text-action-600" /> {ROLE_LABELS[r]}</p>
                 <p className="text-xs text-ink-muted mt-1.5 leading-relaxed">{ROLE_DESCRIPTIONS[r]}</p>
               </div>
             );
@@ -290,7 +290,7 @@ export default function TeamPage() {
 
         <div className="bg-white rounded-2xl border border-brand-100 overflow-hidden">
           {!members ? (
-            <div className="py-12 flex justify-center"><Loader2 className="w-5 h-5 animate-spin text-pepper-600" /></div>
+            <div className="py-12 flex justify-center"><Loader2 className="w-5 h-5 animate-spin text-action-600" /></div>
           ) : (
             <table className="w-full">
               <thead>
@@ -332,7 +332,7 @@ export default function TeamPage() {
                         <div className="flex justify-end gap-1">
                           <button
                             onClick={() => setResetting(m)}
-                            className="flex items-center gap-1 text-xs font-semibold text-ink-soft hover:text-pepper-600 px-2 py-1.5 rounded-lg hover:bg-brand-50"
+                            className="flex items-center gap-1 text-xs font-semibold text-ink-soft hover:text-action-600 px-2 py-1.5 rounded-lg hover:bg-brand-50"
                           >
                             <KeyRound className="w-3.5 h-3.5" /> Contraseña
                           </button>
@@ -340,7 +340,7 @@ export default function TeamPage() {
                             <button
                               onClick={() => update(m, { isActive: !m.isActive })}
                               disabled={busy === m.id}
-                              className="text-xs font-semibold text-ink-soft hover:text-pepper-600 px-2 py-1.5 rounded-lg hover:bg-brand-50 disabled:opacity-50"
+                              className="text-xs font-semibold text-ink-soft hover:text-action-600 px-2 py-1.5 rounded-lg hover:bg-brand-50 disabled:opacity-50"
                             >
                               {m.isActive ? 'Desactivar' : 'Reactivar'}
                             </button>

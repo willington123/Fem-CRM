@@ -9,9 +9,9 @@
 set -e
 
 cd "$(dirname "$0")/.."
-DB_DIR="${TMPDIR:-/tmp}/fem-preview-db"
+DB_DIR="${TMPDIR:-/tmp}/konnexa-preview-db"
 
-export DATABASE_URL="postgresql://fem:fem@127.0.0.1:55432/femcrm"
+export DATABASE_URL="postgresql://konnexa:konnexa@127.0.0.1:55432/konnexa"
 export DIRECT_URL="$DATABASE_URL"
 export JWT_SECRET="preview-local"
 export ALLOW_DEV_LOGIN="true"
@@ -28,12 +28,12 @@ cat > "$DB_DIR/start.mjs" <<'JS'
 import EmbeddedPostgres from 'embedded-postgres';
 const dir = process.env.PREVIEW_DB_DIR;
 const pg = new EmbeddedPostgres({
-  databaseDir: `${dir}/data`, user: 'fem', password: 'fem', port: 55432, persistent: true,
+  databaseDir: `${dir}/data`, user: 'konnexa', password: 'konnexa', port: 55432, persistent: true,
 });
 import { existsSync } from 'node:fs';
 if (!existsSync(`${dir}/data/PG_VERSION`)) await pg.initialise();
 await pg.start();
-try { await pg.createDatabase('femcrm'); } catch {}
+try { await pg.createDatabase('konnexa'); } catch {}
 console.log('postgres listo');
 process.stdin.resume();
 JS
@@ -53,8 +53,8 @@ if [ "$1" = "--reset" ] || [ ! -f "$DB_DIR/.seeded" ]; then
   npx tsx scripts/seed-flows.ts >/dev/null
   node -e "
     const {PrismaClient}=require('@prisma/client');const p=new PrismaClient();
-    p.crmUser.upsert({where:{email:'hola@fem.com.co'},
-      create:{email:'hola@fem.com.co',name:'Equipo Fem',role:'ADMIN',isActive:true},
+    p.crmUser.upsert({where:{email:'hola@konnexa.app'},
+      create:{email:'hola@konnexa.app',name:'Equipo Konnexa',role:'ADMIN',isActive:true},
       update:{isActive:true}}).then(()=>p.\$disconnect());"
   touch "$DB_DIR/.seeded"
 fi
@@ -63,6 +63,6 @@ fi
 npx next build
 echo ""
 echo "  ▸ http://localhost:3111/login"
-echo "  ▸ correo: hola@fem.com.co   ·   contraseña: cualquiera (acceso local)"
+echo "  ▸ correo: hola@konnexa.app   ·   contraseña: cualquiera (acceso local)"
 echo ""
 exec npx next start -p 3111

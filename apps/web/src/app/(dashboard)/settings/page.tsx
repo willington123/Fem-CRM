@@ -34,7 +34,7 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1800);
       }}
-      className="shrink-0 p-1.5 rounded-lg text-ink-muted hover:text-pepper-600 hover:bg-brand-50 transition-colors"
+      className="shrink-0 p-1.5 rounded-lg text-ink-muted hover:text-action-600 hover:bg-brand-50 transition-colors"
       aria-label="Copiar"
       title="Copiar"
     >
@@ -68,9 +68,9 @@ export default function SettingsPage() {
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#FFF8F7] p-8">
+      <div className="flex-1 flex items-center justify-center bg-[#F6F8FC] p-8">
         <div className="text-center max-w-sm">
-          <AlertTriangle className="w-8 h-8 text-pepper-600 mx-auto mb-3" />
+          <AlertTriangle className="w-8 h-8 text-rose-600 mx-auto mb-3" />
           <p className="font-semibold text-ink">No se pudo cargar Ajustes</p>
           <p className="text-sm text-ink-muted mt-1">{error}</p>
           <p className="text-xs text-ink-muted mt-3">Esta página solo la ve un usuario con rol ADMIN.</p>
@@ -81,7 +81,7 @@ export default function SettingsPage() {
 
   if (!data) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#FFF8F7]">
+      <div className="flex-1 flex items-center justify-center bg-[#F6F8FC]">
         <Loader2 className="w-5 h-5 animate-spin text-brand-600" />
       </div>
     );
@@ -90,9 +90,9 @@ export default function SettingsPage() {
   const listas = data.platforms.filter(p => p.ready).length;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#FFF8F7]">
+    <div className="flex-1 overflow-auto bg-[#F6F8FC]">
       {/* Header */}
-      <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-[#F7E4E2] px-8 py-4 z-10">
+      <div className="sticky top-0 bg-white/95 backdrop-blur border-b border-[#E3E9F4] px-8 py-4 z-10">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-[17px] font-bold text-ink">Ajustes e integraciones</h1>
@@ -102,7 +102,7 @@ export default function SettingsPage() {
           </div>
           <button
             onClick={load}
-            className="flex items-center gap-2 border border-brand-200 hover:border-pepper-500 text-ink-soft px-3 py-2 rounded-xl text-xs font-semibold transition-colors"
+            className="flex items-center gap-2 border border-brand-200 hover:border-action-500 text-ink-soft px-3 py-2 rounded-xl text-xs font-semibold transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Revisar de nuevo
           </button>
@@ -113,7 +113,7 @@ export default function SettingsPage() {
 
         {/* Aviso de seguridad: el CRM nunca muestra el valor de un secreto */}
         <div className="flex gap-3 bg-brand-50 border border-brand-200 rounded-2xl px-4 py-3">
-          <Plug className="w-4 h-4 text-pepper-600 shrink-0 mt-0.5" />
+          <Plug className="w-4 h-4 text-action-600 shrink-0 mt-0.5" />
           <p className="text-xs text-ink-soft leading-relaxed">
             Esta pantalla solo dice si cada credencial <strong>está puesta</strong> y si <strong>responde</strong>.
             Nunca muestra su valor. Para cambiarlas, edítalas en Vercel → Settings → Environment Variables
@@ -128,20 +128,20 @@ export default function SettingsPage() {
           const isOpen = open[p.key];
 
           return (
-            <div key={p.key} className="bg-white rounded-2xl border border-[#F7E4E2] overflow-hidden">
+            <div key={p.key} className="bg-white rounded-2xl border border-[#E3E9F4] overflow-hidden">
               <div className="px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       {p.ready
                         ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        : <XCircle className="w-4 h-4 text-pepper-600 shrink-0" />}
+                        : <XCircle className="w-4 h-4 text-rose-600 shrink-0" />}
                       <p className="font-bold text-[15px] text-ink">{p.label}</p>
                       <span className={cn(
                         'text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border',
                         p.ready
                           ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : 'bg-pepper-50 text-pepper-700 border-pepper-200',
+                          : 'bg-rose-50 text-rose-700 border-rose-200',
                       )}>
                         {p.ready ? 'Configurada' : 'Faltan datos'}
                       </span>
@@ -161,7 +161,7 @@ export default function SettingsPage() {
                     <button
                       onClick={() => runTest(p.key)}
                       disabled={test?.loading}
-                      className="flex items-center gap-1.5 border border-brand-200 hover:border-pepper-500 text-ink-soft px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-60"
+                      className="flex items-center gap-1.5 border border-brand-200 hover:border-action-500 text-ink-soft px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-60"
                     >
                       {test?.loading && <Loader2 className="w-3 h-3 animate-spin" />}
                       Probar conexión
@@ -175,7 +175,7 @@ export default function SettingsPage() {
                     'mt-3 text-xs rounded-xl px-3 py-2 border flex gap-2',
                     test.ok
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                      : 'bg-pepper-50 border-pepper-200 text-pepper-700',
+                      : 'bg-rose-50 border-rose-200 text-rose-700',
                   )}>
                     {test.ok ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-px" /> : <XCircle className="w-3.5 h-3.5 shrink-0 mt-px" />}
                     <span className="leading-relaxed">{test.detail}</span>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
                 )}
 
                 {!p.ready && (
-                  <p className="mt-3 text-xs text-pepper-700">
+                  <p className="mt-3 text-xs text-rose-700">
                     Faltan: <span className="font-mono">{p.missingRequired.join(', ')}</span>
                   </p>
                 )}
@@ -192,21 +192,21 @@ export default function SettingsPage() {
               {/* Detalle plegable */}
               <button
                 onClick={() => setOpen(o => ({ ...o, [p.key]: !o[p.key] }))}
-                className="w-full flex items-center justify-between px-5 py-2.5 border-t border-[#F7E4E2] text-xs font-semibold text-ink-soft hover:bg-brand-50 transition-colors"
+                className="w-full flex items-center justify-between px-5 py-2.5 border-t border-[#E3E9F4] text-xs font-semibold text-ink-soft hover:bg-brand-50 transition-colors"
               >
                 <span>{p.vars.length} variables{p.webhooks.length > 0 && ` · ${p.webhooks.length} webhook${p.webhooks.length === 1 ? '' : 's'}`}</span>
                 <ChevronDown className={cn('w-4 h-4 transition-transform', isOpen && 'rotate-180')} />
               </button>
 
               {isOpen && (
-                <div className="px-5 py-4 border-t border-[#F7E4E2] bg-[#FFFBFA] space-y-4">
+                <div className="px-5 py-4 border-t border-[#E3E9F4] bg-[#FAFBFE] space-y-4">
                   <div className="space-y-2">
                     {p.vars.map(v => (
                       <div key={v.name} className="flex items-start gap-2.5">
                         {v.present
                           ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                           : v.required
-                            ? <XCircle className="w-3.5 h-3.5 text-pepper-600 shrink-0 mt-0.5" />
+                            ? <XCircle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
                             : <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />}
                         <div className="min-w-0">
                           <p className="text-xs font-mono text-ink">
@@ -220,7 +220,7 @@ export default function SettingsPage() {
                   </div>
 
                   {p.webhooks.length > 0 && (
-                    <div className="space-y-2 pt-3 border-t border-[#F7E4E2]">
+                    <div className="space-y-2 pt-3 border-t border-[#E3E9F4]">
                       <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
                         URLs para registrar en el panel del proveedor
                       </p>

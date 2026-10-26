@@ -34,13 +34,13 @@ function OrderCard({ order, onOpen, canEdit }: { order: OrderDetail; onOpen: () 
             <AvatarFallback className="text-xs">{initials(order.customer.name)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <Link href={`/customers/${order.customer.id}`} className="text-sm font-semibold text-ink hover:text-pepper-600 leading-tight truncate block">
+            <Link href={`/customers/${order.customer.id}`} className="text-sm font-semibold text-ink hover:text-action-600 leading-tight truncate block">
               {order.customer.name}
             </Link>
             <p className="text-xs text-muted-foreground">{orderLabel(order)}</p>
           </div>
         </div>
-        <p className="font-bold text-pepper-600 text-sm shrink-0">{formatCOP(Number(order.totalAmount))}</p>
+        <p className="font-bold text-action-600 text-sm shrink-0">{formatCOP(Number(order.totalAmount))}</p>
       </div>
 
       <div className="space-y-1">
@@ -125,7 +125,7 @@ export default function OrdersPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Clienta, teléfono, pedido o guía"
-                className="h-9 w-64 pl-8 pr-3 rounded-lg border border-brand-100 text-sm bg-white outline-none focus:border-pepper-500"
+                className="h-9 w-64 pl-8 pr-3 rounded-lg border border-brand-100 text-sm bg-white outline-none focus:border-action-500"
               />
             </div>
             <div className="flex gap-1 bg-brand-50 rounded-lg p-1">
@@ -189,7 +189,7 @@ export default function OrdersPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Avatar className="w-7 h-7"><AvatarFallback className="text-xs">{initials(order.customer.name)}</AvatarFallback></Avatar>
-                        <Link href={`/customers/${order.customer.id}`} className="text-sm font-medium text-ink hover:text-pepper-600">{order.customer.name}</Link>
+                        <Link href={`/customers/${order.customer.id}`} className="text-sm font-medium text-ink hover:text-action-600">{order.customer.name}</Link>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-ink-soft">{order.customer.city || '—'}</td>
@@ -199,7 +199,7 @@ export default function OrdersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs font-mono text-ink-muted">{order.trackingNumber || '—'}</td>
-                    <td className="px-4 py-3 font-semibold text-pepper-600">{formatCOP(Number(order.totalAmount))}</td>
+                    <td className="px-4 py-3 font-semibold text-action-600">{formatCOP(Number(order.totalAmount))}</td>
                     <td className="px-4 py-3 text-xs text-ink-muted">{formatRelativeTime(order.createdAt)}</td>
                     <td className="px-4 py-3">
                       <button onClick={() => setOpen(order)} className="p-1.5 hover:bg-white rounded-lg" title="Actualizar pedido" aria-label="Actualizar pedido">

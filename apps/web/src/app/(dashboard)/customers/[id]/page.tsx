@@ -34,7 +34,7 @@ export default function CustomerProfilePage() {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-2">
-          <div className="w-8 h-8 border-2 border-pepper-600 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-8 h-8 border-2 border-action-600 border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-ink-muted">Cargando cliente…</p>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function CustomerProfilePage() {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center space-y-3">
           <p className="text-ink-muted font-medium">Cliente no encontrado</p>
-          <button onClick={() => router.back()} className="text-sm text-pepper-600 hover:underline">← Volver</button>
+          <button onClick={() => router.back()} className="text-sm text-action-600 hover:underline">← Volver</button>
         </div>
       </div>
     );
@@ -121,7 +121,7 @@ export default function CustomerProfilePage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">LTV total</span>
-                <span className="font-bold text-pepper-600 text-lg">{formatCOP(customer.ltv)}</span>
+                <span className="font-bold text-action-600 text-lg">{formatCOP(customer.ltv)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Total pedidos</span>
@@ -180,7 +180,7 @@ export default function CustomerProfilePage() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <ShoppingBag className="w-4 h-4 text-pepper-600" />
+                <ShoppingBag className="w-4 h-4 text-action-600" />
                 Historial de pedidos
               </CardTitle>
             </CardHeader>
@@ -196,7 +196,7 @@ export default function CustomerProfilePage() {
                       <span className={cn('px-2.5 py-1 rounded-full text-xs font-medium', ORDER_STATUS_COLORS[order.status])}>
                         {ORDER_STATUS_LABELS[order.status]}
                       </span>
-                      <p className="font-bold text-pepper-600">{formatCOP(order.totalAmount)}</p>
+                      <p className="font-bold text-action-600">{formatCOP(order.totalAmount)}</p>
                     </div>
                   ))}
                 </div>
@@ -216,11 +216,11 @@ export default function CustomerProfilePage() {
                 <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-brand-50" />
                 {[
                   { label: 'Primer contacto', date: customer.firstContactAt, color: 'bg-blue-400' },
-                  { label: 'Primera compra', date: customer.firstPurchaseAt, color: 'bg-pepper-600' },
+                  { label: 'Primera compra', date: customer.firstPurchaseAt, color: 'bg-action-600' },
                   ...(customer.orders || []).slice(1).map((o: any, i: number) => ({
                     label: `Compra #${i + 2}`,
                     date: o.createdAt,
-                    color: 'bg-pepper-600',
+                    color: 'bg-action-600',
                   })),
                   customer.lastPurchaseAt && customer.orders?.length > 1 ? null : null,
                 ].filter(Boolean).map((event: any, i) => (

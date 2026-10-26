@@ -1,98 +1,74 @@
 """
-Genera versiones con transparencia real del logotipo y del isotipo de Fem.
+Genera los archivos del logo de Konnexa a partir del logo original (PNG o WebP
+con fondo transparente):
 
-Los exportes de Figma vienen con el fondo blanco del frame «quemado» dentro de
-la imagen, así que `brightness-0 invert` pintaba el rectángulo entero de blanco.
-Aquí se recupera la cobertura de tinta de cada píxel (cuánto se aleja del blanco)
-y se usa como canal alfa, conservando el antialias de los bordes.
+    python3 scripts/make-logo-assets.py ruta/al/logo-konnexa.webp
+
+Crea, desde la carpeta apps/web:
+  public/konnexa-logo.png        logo completo a color (para fondos claros)
+  public/konnexa-logo-white.png  el mismo con las letras en blanco (fondos oscuros)
+  public/konnexa-icon.png        solo la K con la burbuja, cuadrado, 256 px
+  src/app/icon.png               ícono de la pestaña del navegador, 512 px
+
+Requiere Pillow (pip install pillow).
 """
-import struct, zlib, sys
+import sys
+from PIL import Image
 
 
-def read_png(path):
-    d = open(path, 'rb').read()
-    w, h, bd, ct = struct.unpack('>IIBB', d[16:26])
-    assert bd == 8 and ct in (2, 6), f'{path}: formato no soportado ({bd}/{ct})'
-    bpp = 3 if ct == 2 else 4
-    i, idat = 8, b''
-    while i < len(d):
-        ln = struct.unpack('>I', d[i:i + 4])[0]
-        if d[i + 4:i + 8] == b'IDAT':
-            idat += d[i + 8:i + 8 + ln]
-        i += 12 + ln
-    raw = zlib.decompress(idat)
-    stride = w * bpp
-    prev = bytearray(stride)
-    rows, p = [], 0
-    for _ in range(h):
-        f = raw[p]; p += 1
-        line = bytearray(raw[p:p + stride]); p += stride
-        for x in range(stride):
-            a = line[x - bpp] if x >= bpp else 0
-            b = prev[x]
-            c = prev[x - bpp] if x >= bpp else 0
-            if f == 1:   line[x] = (line[x] + a) & 255
-            elif f == 2: line[x] = (line[x] + b) & 255
-            elif f == 3: line[x] = (line[x] + (a + b) // 2) & 255
-            elif f == 4:
-                pa, pb, pc = abs(b - c), abs(a - c), abs(a + b - 2 * c)
-                pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
-                line[x] = (line[x] + pr) & 255
-        prev = line
-        rows.append(bytes(line))
-    return w, h, bpp, rows
+def trim(img, threshold=20):
+    alpha = img.getchannel('A').point(lambda v: 255 if v > threshold else 0)
+    return img.crop(alpha.getbbox())
 
 
-def write_png(path, w, h, rgba_rows):
-    raw = b''.join(b'\x00' + bytes(r) for r in rgba_rows)
-
-    def chunk(tag, data):
-        return (struct.pack('>I', len(data)) + tag + data
-                + struct.pack('>I', zlib.crc32(tag + data) & 0xFFFFFFFF))
-
-    out = (b'\x89PNG\r\n\x1a\n'
-           + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 6, 0, 0, 0))
-           + chunk(b'IDAT', zlib.compress(raw, 9))
-           + chunk(b'IEND', b''))
-    open(path, 'wb').write(out)
+def is_lettering(r, g, b):
+    # Las letras son azul marino casi negro; el ícono es azul brillante, cian o verde.
+    return max(r, g, b) < 90 and b < 110
 
 
-def recolor(src, dst, rgb):
-    """Reescribe `src` con el color `rgb` y el alfa tomado de la cobertura de tinta."""
-    w, h, bpp, rows = read_png(src)
+def main(src):
+    im = Image.open(src).convert('RGBA')
+    full = trim(im)
 
-    # Nivel de tinta "sólida": el valor de cobertura más repetido entre los
-    # píxeles con tinta. Se normaliza contra él (y no contra el máximo) porque
-    # el máximo lo marcan cuatro píxeles del borde del ™ y dejaba el relleno
-    # del trazo translúcido.
-    hist = {}
-    for r in rows:
-        for x in range(0, len(r), bpp):
-            cover = 255 - min(r[x], r[x + 1], r[x + 2])
-            if cover > 8:
-                hist[cover] = hist.get(cover, 0) + 1
-    if not hist:
-        sys.exit(f'{src}: la imagen es blanca entera')
-    peak = max(hist, key=lambda k: hist[k])
+    def save_wide(img, path, width=900):
+        w, h = img.size
+        img.resize((width, round(h * width / w)), Image.LANCZOS).save(path, optimize=True)
 
-    out = []
-    for r in rows:
-        line = bytearray(w * 4)
-        for x in range(w):
-            o = x * bpp
-            cover = (255 - min(r[o], r[o + 1], r[o + 2])) / peak
-            a = max(0, min(255, round(cover * 255)))
-            line[x * 4:x * 4 + 4] = bytes((rgb[0], rgb[1], rgb[2], a))
-        out.append(line)
+    save_wide(full, 'public/konnexa-logo.png')
 
-    write_png(dst, w, h, out)
-    print(f'{dst}  ({w}x{h}, alfa desde cobertura, pico={peak})')
+    white = full.copy()
+    px = white.load()
+    for y in range(white.size[1]):
+        for x in range(white.size[0]):
+            r, g, b, a = px[x, y]
+            if a and is_lettering(r, g, b):
+                px[x, y] = (255, 255, 255, a)
+    save_wide(white, 'public/konnexa-logo-white.png')
+
+    # El ícono ocupa el primer ~28 % del ancho; la K de la palabra empieza
+    # justo después y se borra por color.
+    W, H = im.size
+    left, right = int(W * 0.05), int(W * 0.30)
+    mark = im.crop((left, int(H * 0.09), right, int(H * 0.90))).copy()
+    px = mark.load()
+    cut = int(W * 0.2575) - left
+    for y in range(mark.size[1]):
+        for x in range(cut, mark.size[0]):
+            r, g, b, a = px[x, y]
+            if a and is_lettering(r, g, b):
+                px[x, y] = (0, 0, 0, 0)
+    mark = trim(mark, 30)
+
+    side = max(mark.size)
+    side += 2 * int(side * 0.06)
+    square = Image.new('RGBA', (side, side), (0, 0, 0, 0))
+    square.paste(mark, ((side - mark.size[0]) // 2, (side - mark.size[1]) // 2), mark)
+    square.resize((256, 256), Image.LANCZOS).save('public/konnexa-icon.png', optimize=True)
+    square.resize((512, 512), Image.LANCZOS).save('src/app/icon.png', optimize=True)
+    print('Listo: public/konnexa-*.png y src/app/icon.png')
 
 
 if __name__ == '__main__':
-    base = '/Users/mateoveralondono/Documents/Fem-CRM/apps/web/public'
-    ROSA = (255, 157, 163)
-    BLANCO = (255, 255, 255)
-    recolor(f'{base}/fem-logo.png',  f'{base}/fem-logo-white.png', BLANCO)
-    recolor(f'{base}/fem-logo.png',  f'{base}/fem-logo.png',       ROSA)
-    recolor(f'{base}/fem-icon.png',  f'{base}/fem-icon.png',       ROSA)
+    if len(sys.argv) != 2:
+        sys.exit('Uso: python3 scripts/make-logo-assets.py ruta/al/logo.webp')
+    main(sys.argv[1])

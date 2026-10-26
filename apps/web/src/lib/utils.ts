@@ -80,7 +80,7 @@ export const CUSTOMER_STATUS_COLORS: Record<string, string> = {
   NEW: 'bg-blue-100 text-blue-700',
   ACTIVE: 'bg-green-100 text-green-700',
   AT_RISK: 'bg-orange-100 text-orange-700',
-  RECURRING: 'bg-brand-100 text-pepper-700',
+  RECURRING: 'bg-brand-100 text-action-700',
   LOST: 'bg-brand-50 text-ink-muted',
 };
 

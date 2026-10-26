@@ -101,7 +101,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-brand-100">
           <div className="flex items-center gap-2.5">
-            <ShoppingBag className="w-5 h-5 text-pepper-600" />
+            <ShoppingBag className="w-5 h-5 text-action-600" />
             <div>
               <h2 className="text-base font-bold text-ink">Crear pedido</h2>
               <p className="text-xs text-ink-muted">{initial.phone}</p>
@@ -125,7 +125,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
               <a href="/orders" className="px-4 h-9 inline-flex items-center rounded-xl border border-brand-200 text-sm font-semibold text-ink-soft hover:bg-brand-50">
                 Ver pedidos
               </a>
-              <button onClick={onClose} className="px-4 h-9 rounded-xl bg-pepper-600 hover:bg-pepper-700 text-white text-sm font-semibold">
+              <button onClick={onClose} className="px-4 h-9 rounded-xl bg-action-600 hover:bg-action-700 text-white text-sm font-semibold">
                 Volver al chat
               </button>
             </div>
@@ -159,7 +159,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
                       <Input value={r.price} onChange={e => setRow(i, { price: e.target.value })} inputMode="numeric" placeholder="$ 0" aria-label="Precio" />
                       <button
                         onClick={() => setRows(rs => (rs.length > 1 ? rs.filter((_, j) => j !== i) : [emptyRow()]))}
-                        className="h-9 w-8 flex items-center justify-center rounded-lg text-ink-muted hover:text-pepper-600 hover:bg-brand-50"
+                        className="h-9 w-8 flex items-center justify-center rounded-lg text-ink-muted hover:text-action-600 hover:bg-brand-50"
                         aria-label="Quitar producto"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -168,7 +168,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
                   ))}
                   <button
                     onClick={() => setRows(rs => [...rs, emptyRow()])}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-pepper-600 hover:text-pepper-700 px-1 py-1"
+                    className="flex items-center gap-1.5 text-xs font-semibold text-action-600 hover:text-action-700 px-1 py-1"
                   >
                     <Plus className="w-3.5 h-3.5" /> Otro producto
                   </button>
@@ -207,7 +207,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
                     key={String(o.value)}
                     className={cn(
                       'flex gap-3 items-start rounded-xl border px-3 py-2.5 cursor-pointer transition-colors',
-                      sendConfirmation === o.value ? 'border-pepper-500 bg-brand-50' : 'border-brand-100 hover:bg-brand-50',
+                      sendConfirmation === o.value ? 'border-action-500 bg-brand-50' : 'border-brand-100 hover:bg-brand-50',
                     )}
                   >
                     <input
@@ -215,7 +215,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
                       name="confirmation"
                       checked={sendConfirmation === o.value}
                       onChange={() => setSendConfirmation(o.value)}
-                      className="mt-1 accent-[#D33A22]"
+                      className="mt-1 accent-[#0050D6]"
                     />
                     <span>
                       <span className="block text-sm font-semibold text-ink">{o.title}</span>
@@ -229,10 +229,10 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
             <div className="border-t border-brand-100 px-6 py-4 flex items-center gap-4">
               <div className="flex-1 min-w-0">
                 {error ? (
-                  <p className="text-sm text-pepper-700 flex items-center gap-1.5"><AlertCircle className="w-4 h-4 shrink-0" /> {error}</p>
+                  <p className="text-sm text-rose-700 flex items-center gap-1.5"><AlertCircle className="w-4 h-4 shrink-0" /> {error}</p>
                 ) : (
                   <p className="text-sm text-ink-soft">
-                    Total <span className="text-lg font-bold text-pepper-600 ml-1 tabular-nums">{formatCOP(total)}</span>
+                    Total <span className="text-lg font-bold text-action-600 ml-1 tabular-nums">{formatCOP(total)}</span>
                     {toNumber(shipping) > 0 && <span className="text-xs text-ink-muted ml-2">incluye envío</span>}
                   </p>
                 )}
@@ -243,7 +243,7 @@ export function CreateOrderModal({ customerId, conversationId, initial, onClose,
               <button
                 onClick={submit}
                 disabled={saving}
-                className="px-5 h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center gap-2"
+                className="px-5 h-10 rounded-xl bg-action-600 hover:bg-action-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center gap-2"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                 Crear pedido

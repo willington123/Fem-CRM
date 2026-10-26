@@ -73,7 +73,7 @@ function buildContext(order: any): OrderContext {
 
   return {
     firstName: (order.customer?.name ?? '').trim().split(/\s+/)[0] || 'Hola',
-    product:   items[0]?.name?.trim() || items[0]?.name_product?.trim() || 'tu pedido Fem',
+    product:   items[0]?.name?.trim() || items[0]?.name_product?.trim() || 'tu pedido',
     address:   addr.address || addr.address1 || 'la dirección registrada',
     city:      addr.city || order.customer?.city || 'tu ciudad',
     guide:     order.trackingNumber || 'la guía asignada',

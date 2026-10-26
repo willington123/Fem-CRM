@@ -81,7 +81,7 @@ export function OrderUpdateModal({ order, onClose, onSaved, readOnly = false }: 
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           {/* Resumen */}
-          <div className="rounded-xl border border-brand-100 bg-[#FFFBFA] p-3 space-y-2">
+          <div className="rounded-xl border border-brand-100 bg-[#FAFBFE] p-3 space-y-2">
             {items.map((i, k) => (
               <div key={k} className="flex justify-between text-sm">
                 <span className="text-ink-soft">{i.quantity}× {i.name}</span>
@@ -90,7 +90,7 @@ export function OrderUpdateModal({ order, onClose, onSaved, readOnly = false }: 
             ))}
             <div className="flex justify-between text-sm font-bold border-t border-brand-100 pt-2">
               <span className="text-ink">Total</span>
-              <span className="text-pepper-600 tabular-nums">{formatCOP(Number(order.totalAmount))}</span>
+              <span className="text-action-600 tabular-nums">{formatCOP(Number(order.totalAmount))}</span>
             </div>
             {(addr.address || addr.address1 || addr.city) && (
               <p className="text-xs text-ink-muted flex gap-1.5 pt-1">
@@ -141,12 +141,12 @@ export function OrderUpdateModal({ order, onClose, onSaved, readOnly = false }: 
             </p>
           )}
           {error && (
-            <p className="text-sm text-pepper-700 flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> {error}</p>
+            <p className="text-sm text-rose-700 flex items-center gap-1.5"><AlertCircle className="w-4 h-4" /> {error}</p>
           )}
         </div>
 
         <div className="border-t border-brand-100 px-6 py-4 flex justify-end gap-2">
-          <a href={`/customers/${order.customer.id}`} className="mr-auto px-3 h-10 inline-flex items-center text-sm font-semibold text-ink-soft hover:text-pepper-600">
+          <a href={`/customers/${order.customer.id}`} className="mr-auto px-3 h-10 inline-flex items-center text-sm font-semibold text-ink-soft hover:text-action-600">
             Ver clienta
           </a>
           <button onClick={onClose} className="px-4 h-10 rounded-xl border border-brand-200 text-sm font-semibold text-ink-soft hover:bg-brand-50">
@@ -155,7 +155,7 @@ export function OrderUpdateModal({ order, onClose, onSaved, readOnly = false }: 
           {!readOnly && <button
             onClick={save}
             disabled={saving || unchanged}
-            className={cn('px-5 h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 disabled:opacity-50 text-white text-sm font-semibold flex items-center gap-2')}
+            className={cn('px-5 h-10 rounded-xl bg-action-600 hover:bg-action-700 disabled:opacity-50 text-white text-sm font-semibold flex items-center gap-2')}
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             Guardar

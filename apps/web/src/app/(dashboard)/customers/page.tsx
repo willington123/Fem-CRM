@@ -75,7 +75,7 @@ export default function CustomersPage() {
                 onClick={() => setFilterStatus(key)}
                 className={cn(
                   'px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
-                  filterStatus === key ? 'bg-pepper-600 text-white border-pepper-600' : 'bg-white text-ink-soft border-brand-100 hover:border-brand-200'
+                  filterStatus === key ? 'bg-action-600 text-white border-action-600' : 'bg-white text-ink-soft border-brand-100 hover:border-brand-200'
                 )}
               >
                 {label}
@@ -125,7 +125,7 @@ export default function CustomersPage() {
                             <AvatarFallback className="text-xs">{initials(c.name)}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <Link href={`/customers/${c.id}`} className="font-medium text-ink text-sm hover:text-pepper-600">
+                            <Link href={`/customers/${c.id}`} className="font-medium text-ink text-sm hover:text-action-600">
                               {c.name}
                             </Link>
                             <p className="text-xs text-muted-foreground">{c.phone}</p>
@@ -146,7 +146,7 @@ export default function CustomersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm font-medium text-ink">{c.totalOrders}</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-pepper-600">{formatCOP(c.ltv)}</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-action-600">{formatCOP(c.ltv)}</td>
                       <td className="px-4 py-3 text-xs text-ink-soft">{c.lastPurchaseAt ? formatDate(c.lastPurchaseAt) : '—'}</td>
                       <td className="px-4 py-3">
                         {dias !== null && (

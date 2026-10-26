@@ -9,9 +9,9 @@ import { formatCOP } from '@/lib/utils';
 
 // Un solo color de datos (familia cálida de la marca, validado para contraste);
 // todo lo demás es tinta gris.
-const ACCENT = '#D33A22';
-const GRID   = '#F7E4E2';
-const TICK   = { fill: '#8C6B66', fontSize: 11 };
+const ACCENT = '#0050D6';
+const GRID   = '#E3E9F4';
+const TICK   = { fill: '#66728C', fontSize: 11 };
 
 const ORDER_STATUS_ES: Record<string, string> = {
   PENDING_CONFIRMATION: 'Por confirmar',
@@ -146,13 +146,13 @@ export default function DashboardPage() {
   const fewPoints = series.length <= 2;
 
   return (
-    <div className="flex-1 overflow-auto bg-[#FFF8F7]">
+    <div className="flex-1 overflow-auto bg-[#F6F8FC]">
       {/* Encabezado + fila única de filtros que aplica a todo lo de abajo */}
       <div className="sticky top-0 bg-white border-b border-brand-100 px-8 py-4 z-10">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <div className="mr-auto">
             <h1 className="text-lg font-bold text-ink">Dashboard</h1>
-            <p className="text-sm text-ink-muted mt-0.5">Fem · ventas por WhatsApp</p>
+            <p className="text-sm text-ink-muted mt-0.5">Resumen de ventas por WhatsApp</p>
           </div>
 
           <div className="flex items-center gap-1 bg-brand-50 rounded-lg p-1">
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                     <CartesianGrid stroke={GRID} vertical={false} />
                     <XAxis dataKey="label" tick={TICK} axisLine={false} tickLine={false} minTickGap={24} />
                     <YAxis tick={TICK} axisLine={false} tickLine={false} tickFormatter={compactCOP} width={52} />
-                    <Tooltip content={<RevenueTooltip />} cursor={{ stroke: '#F0C9C6', strokeWidth: 1 }} />
+                    <Tooltip content={<RevenueTooltip />} cursor={{ stroke: '#C9D5EA', strokeWidth: 1 }} />
                     <Area
                       type="monotone"
                       dataKey="revenue"
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                     <CartesianGrid stroke={GRID} vertical={false} />
                     <XAxis dataKey="label" tick={TICK} axisLine={false} tickLine={false} minTickGap={24} />
                     <YAxis tick={TICK} axisLine={false} tickLine={false} allowDecimals={false} width={52} />
-                    <Tooltip content={<OrdersTooltip />} cursor={{ fill: '#FFF0EF' }} />
+                    <Tooltip content={<OrdersTooltip />} cursor={{ fill: '#EEF4FF' }} />
                     <Bar dataKey="orders" fill={ACCENT} radius={[3, 3, 0, 0]} maxBarSize={28} />
                   </BarChart>
                 </ResponsiveContainer>

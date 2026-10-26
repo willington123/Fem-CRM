@@ -25,7 +25,7 @@ export function MediaBubble({ media, caption, isOut }: MediaBubbleProps) {
 
   const shell = cn(
     'rounded-2xl overflow-hidden border max-w-[320px]',
-    isOut ? 'border-[#ED5340]/35 bg-[#FFF0EF]' : 'border-[#F7E4E2] bg-white',
+    isOut ? 'border-[#015EF7]/35 bg-[#EEF4FF]' : 'border-[#E3E9F4] bg-white',
   );
 
   if (kind === 'image') {
@@ -44,7 +44,7 @@ export function MediaBubble({ media, caption, isOut }: MediaBubbleProps) {
             </span>
           </button>
           {realCaption && (
-            <p className="px-3 py-2 text-[13px] leading-snug text-[#2E1614]">{realCaption}</p>
+            <p className="px-3 py-2 text-[13px] leading-snug text-[#0B1630]">{realCaption}</p>
           )}
         </div>
 
@@ -72,7 +72,7 @@ export function MediaBubble({ media, caption, isOut }: MediaBubbleProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
-              className="absolute bottom-6 flex items-center gap-2 bg-white/95 hover:bg-white text-[#2E1614] px-4 py-2 rounded-xl text-xs font-semibold"
+              className="absolute bottom-6 flex items-center gap-2 bg-white/95 hover:bg-white text-[#0B1630] px-4 py-2 rounded-xl text-xs font-semibold"
             >
               <Download className="w-3.5 h-3.5" /> Abrir en pestaña nueva
             </a>
@@ -86,7 +86,7 @@ export function MediaBubble({ media, caption, isOut }: MediaBubbleProps) {
     return (
       <div className={cn(shell, 'p-3 w-[300px]')}>
         <audio controls preload="metadata" src={media.url} className="w-full h-9" />
-        {realCaption && <p className="mt-2 text-[13px] text-[#2E1614]">{realCaption}</p>}
+        {realCaption && <p className="mt-2 text-[13px] text-[#0B1630]">{realCaption}</p>}
       </div>
     );
   }
@@ -95,7 +95,7 @@ export function MediaBubble({ media, caption, isOut }: MediaBubbleProps) {
     return (
       <div className={shell}>
         <video controls preload="metadata" src={media.url} className="w-full max-h-[300px] bg-black" />
-        {realCaption && <p className="px-3 py-2 text-[13px] text-[#2E1614]">{realCaption}</p>}
+        {realCaption && <p className="px-3 py-2 text-[13px] text-[#0B1630]">{realCaption}</p>}
       </div>
     );
   }
@@ -109,15 +109,15 @@ export function MediaBubble({ media, caption, isOut }: MediaBubbleProps) {
       className={cn(shell, 'flex items-center gap-3 p-3 hover:brightness-[0.98] transition')}
     >
       <span className="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0">
-        <FileText className="w-5 h-5 text-pepper-600" />
+        <FileText className="w-5 h-5 text-action-600" />
       </span>
       <span className="min-w-0">
-        <span className="block text-[13px] font-semibold text-[#2E1614] truncate">
+        <span className="block text-[13px] font-semibold text-[#0B1630] truncate">
           {media.filename || realCaption || 'Documento'}
         </span>
-        <span className="block text-[11px] text-[#8C6B66]">{prettySize(media.size)} · abrir</span>
+        <span className="block text-[11px] text-[#66728C]">{prettySize(media.size)} · abrir</span>
       </span>
-      <Download className="w-4 h-4 text-[#8C6B66] shrink-0 ml-auto" />
+      <Download className="w-4 h-4 text-[#66728C] shrink-0 ml-auto" />
     </a>
   );
 }

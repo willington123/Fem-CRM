@@ -41,7 +41,7 @@ export function ChangePasswordModal({ onClose }: { onClose: () => void }) {
           {done ? (
             <>
               <p className="text-sm text-emerald-800 flex gap-2"><CheckCircle2 className="w-4 h-4 shrink-0 mt-px" /> Listo. La próxima vez entra con la contraseña nueva.</p>
-              <button onClick={onClose} className="w-full h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 text-white text-sm font-semibold">Cerrar</button>
+              <button onClick={onClose} className="w-full h-10 rounded-xl bg-action-600 hover:bg-action-700 text-white text-sm font-semibold">Cerrar</button>
             </>
           ) : (
             <>
@@ -58,8 +58,8 @@ export function ChangePasswordModal({ onClose }: { onClose: () => void }) {
                 <Input type="password" value={repeat} onChange={e => setRepeat(e.target.value)} className="mt-1" autoComplete="new-password"
                   onKeyDown={e => { if (e.key === 'Enter') submit(); }} />
               </div>
-              {error && <p className="text-sm text-pepper-700 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0 mt-px" /> {error}</p>}
-              <button onClick={submit} disabled={saving} className="w-full h-10 rounded-xl bg-pepper-600 hover:bg-pepper-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center justify-center gap-2">
+              {error && <p className="text-sm text-rose-700 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0 mt-px" /> {error}</p>}
+              <button onClick={submit} disabled={saving} className="w-full h-10 rounded-xl bg-action-600 hover:bg-action-700 disabled:opacity-60 text-white text-sm font-semibold flex items-center justify-center gap-2">
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />} Guardar
               </button>
             </>

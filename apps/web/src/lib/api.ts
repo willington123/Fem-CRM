@@ -1,6 +1,6 @@
 function getToken() {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('fem_token');
+  return localStorage.getItem('konnexa_token');
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -15,10 +15,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   });
 
   if (res.status === 401) {
-    // Se limpian los dos: dejar `fem_user` hacía que la sesión caducada
+    // Se limpian los dos: dejar `konnexa_user` hacía que la sesión caducada
     // siguiera pintando el nombre de la usuaria en el menú lateral.
-    localStorage.removeItem('fem_token');
-    localStorage.removeItem('fem_user');
+    localStorage.removeItem('konnexa_token');
+    localStorage.removeItem('konnexa_user');
     window.location.href = '/login';
     throw new Error('No autorizado');
   }

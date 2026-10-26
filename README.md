@@ -1,6 +1,6 @@
-# Fem-CRM
+# Konnexa
 
-CRM omnicanal de Fem: bandeja de WhatsApp / Instagram / Facebook, seguimiento de
+CRM conversacional: bandeja de WhatsApp / Instagram / Facebook, seguimiento de
 pedidos tomados por WhatsApp, flujos automáticos de mensajes y analítica.
 
 Next.js 14 (App Router) · Prisma · PostgreSQL en Supabase · Tailwind · desplegado en Vercel.

@@ -58,21 +58,15 @@ export function Sidebar() {
     <aside className="fixed left-0 top-0 h-screen w-[220px] bg-white border-r border-brand-100 flex flex-col z-30">
       {/* Logo */}
       <div className="h-16 flex items-center px-5 border-b border-brand-100">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl overflow-hidden bg-brand-50 flex items-center justify-center border border-brand-100">
-            <Image
-              src="/fem-icon.png"
-              alt="Fem"
-              width={32}
-              height={32}
-              className="object-contain w-full h-full p-0.5"
-              priority
-            />
-          </div>
-          <div>
-            <p className="font-display font-bold text-[15px] text-ink leading-none">Fem</p>
-            <p className="text-[10px] text-pepper-600 font-semibold uppercase tracking-widest mt-0.5">CRM</p>
-          </div>
+        <Link href="/dashboard" className="flex items-center" aria-label="Konnexa · ir al dashboard">
+          <Image
+            src="/konnexa-logo.png"
+            alt="Konnexa"
+            width={900}
+            height={228}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
       </div>
 
@@ -88,7 +82,7 @@ export function Sidebar() {
               className={cn(
                 'flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
                 active
-                  ? 'bg-pepper-600 text-white'
+                  ? 'bg-action-600 text-white'
                   : 'text-ink-soft hover:bg-brand-50 hover:text-ink'
               )}
             >
@@ -97,7 +91,7 @@ export function Sidebar() {
                 {label}
               </span>
               {count > 0 && !active && (
-                <span className="min-w-[20px] h-5 bg-pepper-600 text-white text-[11px] font-bold rounded-full flex items-center justify-center px-1.5 tabular-nums">
+                <span className="min-w-[20px] h-5 bg-action-600 text-white text-[11px] font-bold rounded-full flex items-center justify-center px-1.5 tabular-nums">
                   {count > 99 ? '99+' : count}
                 </span>
               )}
@@ -110,7 +104,7 @@ export function Sidebar() {
       <div className="p-3 border-t border-brand-100">
         <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-brand-50 group cursor-pointer transition-colors">
           <Avatar className="w-7 h-7 shrink-0">
-            <AvatarFallback className="text-xs bg-brand-100 text-pepper-700 font-semibold">
+            <AvatarFallback className="text-xs bg-brand-100 text-action-700 font-semibold">
               {initials(user?.name || 'US')}
             </AvatarFallback>
           </Avatar>

@@ -1,19 +1,18 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Sistema de color Fem.
+ * Sistema de color Konnexa, sacado del logo.
  *
- * El manual de marca define dos tintas y su proporción: Rosa Melocotón al 70 %
- * y Rojo Pimiento al 30 %. Esa proporción se traduce así en producto:
+ *   action (azul Konnexa #015EF7) → botones, estado activo, enlaces, datos.
+ *   brand  (azul muy claro)       → superficies, tintes, bordes, avatares.
+ *   mint   (verde Konnexa #0ACA62) → acento puntual y degradados de marca.
+ *   ink    (azul marino #0B1630)  → texto.
  *
- *   brand  (Rosa Melocotón #FF9DA3) → superficies, tintes, bordes, avatares.
- *                                     Es el 70 %: cubre mucha área, poca fuerza.
- *   pepper (Rojo Pimiento  #ED5340) → acciones, estado activo, datos.
- *                                     Es el 30 %: poca área, toda la fuerza.
- *
- * Los pasos 600/700 de cada escala existen porque los colores de marca puros
- * no alcanzan contraste AA con texto blanco (#FF9DA3 = 1.98:1, #ED5340 = 3.55:1).
- * Todo lo que lleve texto encima usa pepper-600 (4.77:1) o pepper-700 (6.50:1).
+ * Contraste con texto blanco: action-500 #015EF7 = 5.3:1 y action-600 #0050D6
+ * = 7.0:1, los dos AA. Todo botón con texto blanco usa action-600. El verde no
+ * alcanza AA con texto pequeño encima (2.3:1): solo va en áreas sin texto o con
+ * texto oscuro; para texto verde usar mint-700.
+ * Los errores no usan el color de marca: van en rojo (rose de Tailwind).
  */
 const config: Config = {
   darkMode: ['class'],
@@ -25,39 +24,49 @@ const config: Config = {
         display: ['MontserratAlt', 'Montserrat', 'sans-serif'],
       },
       colors: {
-        // Rosa Melocotón — la tinta del 70 %
+        // Azules claros: superficies y tintes
         brand: {
-          DEFAULT: '#FF9DA3',
-          50:  '#FFF5F5',
-          100: '#FFE7E8',
-          200: '#FFD2D4',
-          300: '#FFB8BC',
-          400: '#FF9DA3',
-          500: '#FA8189',
-          600: '#EE656F',
-          700: '#C94D57',
-          800: '#9E3B44',
-          900: '#6B272E',
+          DEFAULT: '#E6EEFF',
+          50:  '#F3F7FF',
+          100: '#E6EEFF',
+          200: '#CCDCFF',
+          300: '#A3C0FF',
+          400: '#6E9BFF',
+          500: '#3D78FB',
+          600: '#1F63F0',
+          700: '#0F4FC8',
+          800: '#0B3D96',
+          900: '#082A66',
         },
-        // Rojo Pimiento — la tinta del 30 %
-        pepper: {
-          DEFAULT: '#ED5340',
-          50:  '#FFF3F1',
-          100: '#FFE2DD',
-          200: '#FFC7BE',
-          300: '#F89C8B',
-          400: '#F2705A',
-          500: '#ED5340',
-          600: '#D33A22',
-          700: '#B32812',
-          800: '#8F2010',
-          900: '#66170D',
+        // Azul Konnexa: acciones y estado activo
+        action: {
+          DEFAULT: '#015EF7',
+          50:  '#EEF4FF',
+          100: '#DCE8FF',
+          200: '#B9D0FF',
+          300: '#8AB0FF',
+          400: '#4F87FB',
+          500: '#015EF7',
+          600: '#0050D6',
+          700: '#0041B0',
+          800: '#00348C',
+          900: '#001380',
         },
-        // Tinta de texto: casi negro con la temperatura cálida de la marca
+        // Verde Konnexa: acento
+        mint: {
+          DEFAULT: '#0ACA62',
+          50:  '#E9FBF1',
+          100: '#CFF6E1',
+          300: '#6DE3A3',
+          500: '#0ACA62',
+          600: '#08A851',
+          700: '#067A3B',
+        },
+        // Texto: azul marino del logotipo
         ink: {
-          DEFAULT: '#2E1614',
-          soft:    '#5C2A24',
-          muted:   '#8C6B66',
+          DEFAULT: '#0B1630',
+          soft:    '#33405E',
+          muted:   '#66728C',
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

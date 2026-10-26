@@ -130,7 +130,7 @@ function ConvAvatar({ conv, size = 'md' }: { conv: Conversation; size?: 'sm' | '
   const dim = size === 'sm' ? 'w-8 h-8 text-[10px]' : 'w-10 h-10 text-[12px]';
   return (
     <div className="relative shrink-0">
-      <div className={cn('rounded-2xl flex items-center justify-center font-black bg-[#FFF8F7] text-[#2E1614]', dim)}>
+      <div className={cn('rounded-2xl flex items-center justify-center font-black bg-[#F6F8FC] text-[#0B1630]', dim)}>
         {initials(conv.customer.name)}
       </div>
       <span className={cn('absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center', cfg.activeBg)}>
@@ -305,17 +305,17 @@ export default function InboxPage() {
   const selPriority = sel ? waitPriority(sel) : 'normal';
 
   return (
-    <div className="flex h-full bg-[#FFF8F7]">
+    <div className="flex h-full bg-[#F6F8FC]">
 
       {/* ══════════════════════════════════════════════════════════════════════
           LEFT PANEL — Lista de conversaciones
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="w-[300px] shrink-0 flex flex-col bg-white border-r border-[#F7E4E2]">
+      <div className="w-[300px] shrink-0 flex flex-col bg-white border-r border-[#E3E9F4]">
 
         {/* Header */}
-        <div className="px-4 pt-4 pb-3 border-b border-[#F7E4E2] space-y-3">
+        <div className="px-4 pt-4 pb-3 border-b border-[#E3E9F4] space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-extrabold text-[16px] text-[#2E1614]">Bandeja</h2>
+            <h2 className="font-extrabold text-[16px] text-[#0B1630]">Bandeja</h2>
             {pending.length > 0 && (
               <span className="bg-rose-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full">
                 {pending.length} sin responder
@@ -325,23 +325,23 @@ export default function InboxPage() {
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#C6A5A2]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A3ADC2]" />
             <input
               placeholder="Buscar cliente..."
               value={search}
               onChange={e => { setSearch(e.target.value); setTab('all'); }}
-              className="w-full pl-9 pr-3 py-2.5 text-[12px] bg-[#FFF5F5] border border-[#F7E4E2] rounded-xl
-                         focus:outline-none focus:ring-2 focus:ring-pepper-500/20 focus:border-pepper-600
-                         text-[#2E1614] placeholder:text-[#C6A5A2] transition-all"
+              className="w-full pl-9 pr-3 py-2.5 text-[12px] bg-[#F3F7FF] border border-[#E3E9F4] rounded-xl
+                         focus:outline-none focus:ring-2 focus:ring-action-500/20 focus:border-action-600
+                         text-[#0B1630] placeholder:text-[#A3ADC2] transition-all"
             />
           </div>
 
           {/* Tabs */}
-          <div className="flex rounded-xl bg-[#FFF8F7] p-1 gap-1">
+          <div className="flex rounded-xl bg-[#F6F8FC] p-1 gap-1">
             {([['pending', `Sin resp. (${pending.length})`], ['all', 'Abiertas'], ['resolved', 'Resueltas']] as const).map(([k, l]) => (
               <button key={k} onClick={() => setTab(k)}
                 className={cn('flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all',
-                  tab === k ? 'bg-white text-[#2E1614] shadow-sm' : 'text-[#8C6B66] hover:text-[#2E1614]')}>
+                  tab === k ? 'bg-white text-[#0B1630] shadow-sm' : 'text-[#66728C] hover:text-[#0B1630]')}>
                 {l}
               </button>
             ))}
@@ -351,7 +351,7 @@ export default function InboxPage() {
           <div className="flex gap-1.5">
             <button onClick={() => setFilterCh('')}
               className={cn('flex-1 py-1.5 rounded-xl text-[10px] font-bold border transition-all',
-                !filterCh ? 'bg-[#2E1614] text-white border-[#2E1614]' : 'bg-white text-[#8C6B66] border-[#F7E4E2] hover:border-[#C6A5A2]')}>
+                !filterCh ? 'bg-[#0B1630] text-white border-[#0B1630]' : 'bg-white text-[#66728C] border-[#E3E9F4] hover:border-[#A3ADC2]')}>
               Todos
             </button>
             {(['WHATSAPP','INSTAGRAM','FACEBOOK'] as const).map(c => {
@@ -359,7 +359,7 @@ export default function InboxPage() {
               return (
                 <button key={c} onClick={() => setFilterCh(active ? '' : c)}
                   className={cn('flex-1 py-1.5 rounded-xl text-[10px] font-bold border transition-all flex items-center justify-center gap-1',
-                    active ? cfg.pill : 'bg-white border-[#F7E4E2] text-[#8C6B66] hover:border-[#C6A5A2]')}>
+                    active ? cfg.pill : 'bg-white border-[#E3E9F4] text-[#66728C] hover:border-[#A3ADC2]')}>
                   <cfg.icon className="w-3 h-3" />{cfg.short}
                 </button>
               );
@@ -385,10 +385,10 @@ export default function InboxPage() {
                   'w-full text-left px-3 py-3.5 border-b transition-all relative group',
                   /* ── ESTADO ACTIVO: fondo brand sólido ── */
                   isAct
-                    ? 'bg-pepper-600 border-b-pepper-700/10'
+                    ? 'bg-action-600 border-b-action-700/10'
                     : unread
-                      ? 'bg-[#FFF5F5] border-b-[#F7E4E2] hover:bg-brand-50'
-                      : 'bg-white border-b-[#F7E4E2] hover:bg-[#FFF5F5]'
+                      ? 'bg-[#F3F7FF] border-b-[#E3E9F4] hover:bg-brand-50'
+                      : 'bg-white border-b-[#E3E9F4] hover:bg-[#F3F7FF]'
                 )}
               >
                 {/* Barra lateral de prioridad */}
@@ -405,12 +405,12 @@ export default function InboxPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1 mb-0.5">
                       <p className={cn('text-[13px] font-bold truncate',
-                        isAct ? 'text-white' : unread ? 'text-[#2E1614]' : 'text-[#2E1614]')}>
+                        isAct ? 'text-white' : unread ? 'text-[#0B1630]' : 'text-[#0B1630]')}>
                         {conv.customer.name}
                       </p>
                       {conv.lastMessageAt && (
                         <span className={cn('text-[10px] shrink-0 font-medium',
-                          isAct ? 'text-white/70' : 'text-[#8C6B66]')}>
+                          isAct ? 'text-white/70' : 'text-[#66728C]')}>
                           {formatRelativeTime(conv.lastMessageAt)}
                         </span>
                       )}
@@ -419,7 +419,7 @@ export default function InboxPage() {
                     {/* Ciudad + canal */}
                     <div className="flex items-center gap-1.5 mb-1">
                       {conv.customer.city && (
-                        <span className={cn('text-[10px]', isAct ? 'text-white/70' : 'text-[#8C6B66]')}>
+                        <span className={cn('text-[10px]', isAct ? 'text-white/70' : 'text-[#66728C]')}>
                           {conv.customer.city}
                         </span>
                       )}
@@ -431,9 +431,9 @@ export default function InboxPage() {
 
                     {/* Último mensaje */}
                     <p className={cn('text-[11px] truncate leading-snug',
-                      isAct ? 'text-white/80' : 'text-[#8C6B66]')}>
+                      isAct ? 'text-white/80' : 'text-[#66728C]')}>
                       {last?.direction === 'OUTBOUND' && (
-                        <span className={isAct ? 'text-white/60' : 'text-[#C6A5A2]'}>Tú: </span>
+                        <span className={isAct ? 'text-white/60' : 'text-[#A3ADC2]'}>Tú: </span>
                       )}
                       {last?.content}
                     </p>
@@ -450,12 +450,12 @@ export default function InboxPage() {
                       )}
                       {conv.tags.slice(0,1).map(t => (
                         <span key={t} className={cn('text-[9px] px-1.5 py-0.5 rounded-full font-bold border',
-                          isAct ? 'bg-white/20 text-white border-white/30' : 'bg-brand-50 text-pepper-700 border-brand-200')}>
+                          isAct ? 'bg-white/20 text-white border-white/30' : 'bg-brand-50 text-action-700 border-brand-200')}>
                           {t}
                         </span>
                       ))}
                       {unread && (
-                        <span className="ml-auto w-2 h-2 bg-pepper-600 rounded-full shrink-0" />
+                        <span className="ml-auto w-2 h-2 bg-action-600 rounded-full shrink-0" />
                       )}
                     </div>
                   </div>
@@ -465,7 +465,7 @@ export default function InboxPage() {
           })}
           {filtered.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-[#C6A5A2] text-sm font-medium">
+              <p className="text-[#A3ADC2] text-sm font-medium">
                 {loading ? 'Cargando conversaciones…' : 'Sin conversaciones'}
               </p>
             </div>
@@ -479,8 +479,8 @@ export default function InboxPage() {
       {!sel ? (
         <div className="flex-1 flex items-center justify-center bg-white">
           <div className="text-center">
-            <MessageSquare className="w-10 h-10 text-[#F7E4E2] mx-auto mb-3" />
-            <p className="text-[#C6A5A2] text-sm font-medium">
+            <MessageSquare className="w-10 h-10 text-[#E3E9F4] mx-auto mb-3" />
+            <p className="text-[#A3ADC2] text-sm font-medium">
               {loading ? 'Cargando…' : 'Cuando un cliente te escriba, la conversación aparecerá aquí'}
             </p>
           </div>
@@ -508,12 +508,12 @@ export default function InboxPage() {
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               <span className="text-sm text-ink-muted">{sel.customer.phone}</span>
               {sel.customer.city && <span className="text-sm text-ink-muted">· {sel.customer.city}</span>}
-              {sel.agent && <span className="text-sm text-[#D33A22] font-medium">· Atiende {sel.agent.name}</span>}
+              {sel.agent && <span className="text-sm text-[#0050D6] font-medium">· Atiende {sel.agent.name}</span>}
             </div>
           </div>
           {canOrder && <button
             onClick={() => setShowOrder(true)}
-            className="shrink-0 flex items-center gap-1.5 bg-pepper-600 hover:bg-pepper-700 text-white px-3.5 h-9 rounded-xl text-sm font-semibold transition-colors"
+            className="shrink-0 flex items-center gap-1.5 bg-action-600 hover:bg-action-700 text-white px-3.5 h-9 rounded-xl text-sm font-semibold transition-colors"
           >
             <ShoppingBag className="w-4 h-4" /> Crear pedido
           </button>}
@@ -527,7 +527,7 @@ export default function InboxPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3 bg-[#FFF8F7]">
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3 bg-[#F6F8FC]">
           {sel.messages.map((m, i) => {
             const isOut = m.direction === 'OUTBOUND';
             const showDate = i === 0 || new Date(m.createdAt).toDateString() !== new Date(sel.messages[i-1].createdAt).toDateString();
@@ -571,7 +571,7 @@ export default function InboxPage() {
                         : <div className={isOut ? 'bubble-out' : 'bubble-in'}><MessageText text={m.content} /></div>}
                       <div className="flex items-center gap-1.5 mt-1">
                         <p className="text-xs text-ink-muted">{formatRelativeTime(m.createdAt)}</p>
-                        {isOut && m.status === 'READ'      && <CheckCheck className="w-3.5 h-3.5 text-[#D33A22]" />}
+                        {isOut && m.status === 'READ'      && <CheckCheck className="w-3.5 h-3.5 text-[#0050D6]" />}
                         {isOut && m.status === 'DELIVERED' && <CheckCheck className="w-3.5 h-3.5 text-ink-muted" />}
                         {isOut && m.status === 'FAILED'    && (
                           <span className="flex items-center gap-1 text-xs font-semibold text-rose-500">
@@ -629,7 +629,7 @@ export default function InboxPage() {
                       <span className={cn('w-2 h-2 rounded-full shrink-0 mt-1.5', st.dot)} title={st.label} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <code className="text-xs font-bold text-[#8C6B66] font-mono truncate">/{t.name}</code>
+                          <code className="text-xs font-bold text-[#66728C] font-mono truncate">/{t.name}</code>
                           <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand-50 text-ink-muted shrink-0">
                             {TPL_CATEGORY[t.category] ?? t.category}
                           </span>
@@ -657,8 +657,8 @@ export default function InboxPage() {
             <div className="bg-white border border-brand-200 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#8C6B66]">Plantilla</span>
-                  <code className="text-xs font-mono font-bold text-[#8C6B66] bg-brand-50 border border-brand-200 px-2 py-0.5 rounded">/{armed.tpl.name}</code>
+                  <span className="text-xs font-bold text-[#66728C]">Plantilla</span>
+                  <code className="text-xs font-mono font-bold text-[#66728C] bg-brand-50 border border-brand-200 px-2 py-0.5 rounded">/{armed.tpl.name}</code>
                   <span className={cn('w-2 h-2 rounded-full', (TPL_STATUS[armed.tpl.status] ?? TPL_STATUS.PENDING).dot)}
                     title={(TPL_STATUS[armed.tpl.status] ?? TPL_STATUS.PENDING).label} />
                 </div>
@@ -679,7 +679,7 @@ export default function InboxPage() {
                         onChange={e => setArmed(a => a ? { ...a, params: a.params.map((p, idx) => idx === i ? e.target.value : p) } : a)}
                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); send(); } }}
                         placeholder={`Valor para la variable ${i + 1}`}
-                        className="flex-1 h-8 text-sm border border-brand-100 rounded-lg px-2.5 focus:outline-none focus:ring-1 focus:ring-pepper-500 focus:border-pepper-600"
+                        className="flex-1 h-8 text-sm border border-brand-100 rounded-lg px-2.5 focus:outline-none focus:ring-1 focus:ring-action-500 focus:border-action-600"
                       />
                     </div>
                   ))}
@@ -693,7 +693,7 @@ export default function InboxPage() {
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[11px] text-ink-muted leading-snug">Se envía como plantilla aprobada — funciona aunque hayan pasado más de 24h desde el último mensaje del cliente.</p>
                 <button onClick={send} disabled={sending || armed.params.some(p => !p.trim())}
-                  className="px-4 h-9 bg-[#2E1614] hover:bg-[#3A2921] disabled:opacity-30 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shrink-0">
+                  className="px-4 h-9 bg-[#0B1630] hover:bg-[#16244A] disabled:opacity-30 text-white rounded-xl text-sm font-semibold flex items-center gap-2 shrink-0">
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   Enviar plantilla
                 </button>
@@ -702,7 +702,7 @@ export default function InboxPage() {
           ) : (
           <div className="flex items-end gap-3">
             <div className="flex-1 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3
-                            focus-within:border-[#ED5340] focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(237,83,64,0.12)]
+                            focus-within:border-[#015EF7] focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(1,94,247,0.14)]
                             transition-all">
               <textarea
                 ref={inputRef}
@@ -729,7 +729,7 @@ export default function InboxPage() {
                 <button onClick={() => { setShowTpl(s => !s); requestAnimationFrame(() => inputRef.current?.focus()); }}
                   title="Plantillas (/)"
                   className={cn('text-xs font-bold w-6 h-6 rounded-lg flex items-center justify-center transition-colors',
-                    showTpl ? "bg-[#D33A22] text-white" : "text-ink-muted hover:text-[#D33A22] hover:bg-brand-50")}>
+                    showTpl ? "bg-[#0050D6] text-white" : "text-ink-muted hover:text-[#0050D6] hover:bg-brand-50")}>
                   /
                 </button>
                 <button onClick={() => setInternal(i => !i)}
@@ -743,7 +743,7 @@ export default function InboxPage() {
               </div>
             </div>
             <button onClick={send} disabled={!msg.trim() || sending}
-              className="w-11 h-11 bg-[#2E1614] hover:bg-[#3A2921] disabled:opacity-30 text-white rounded-xl flex items-center justify-center shadow-sm transition-all shrink-0">
+              className="w-11 h-11 bg-[#0B1630] hover:bg-[#16244A] disabled:opacity-30 text-white rounded-xl flex items-center justify-center shadow-sm transition-all shrink-0">
               {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>
           </div>

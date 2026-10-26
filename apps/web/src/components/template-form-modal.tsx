@@ -144,7 +144,7 @@ export function TemplateFormModal({ onClose, onCreated }: { onClose: () => void;
                     onClick={() => { setCategory(c.key); setMetaOverride(null); }}
                     className={cn(
                       'text-left px-3 py-2 rounded-lg border transition-all',
-                      category === c.key ? 'border-pepper-600 bg-brand-50 ring-1 ring-pepper-500' : 'border-brand-100 hover:border-brand-200',
+                      category === c.key ? 'border-action-600 bg-brand-50 ring-1 ring-action-500' : 'border-brand-100 hover:border-brand-200',
                     )}
                   >
                     <div className="text-sm font-medium text-ink">{c.label}</div>
@@ -155,7 +155,7 @@ export function TemplateFormModal({ onClose, onCreated }: { onClose: () => void;
               <div className="flex items-center gap-2 mt-2 text-xs text-ink-muted">
                 <Info className="w-3.5 h-3.5 shrink-0" />
                 <span>Se enviará a Meta como <strong className="text-ink-soft">{META_LABELS[metaCategory]}</strong>.</span>
-                <button type="button" onClick={() => setShowAdvanced(s => !s)} className="text-pepper-600 hover:underline">
+                <button type="button" onClick={() => setShowAdvanced(s => !s)} className="text-action-600 hover:underline">
                   {showAdvanced ? 'ocultar' : 'ajustar'}
                 </button>
               </div>
@@ -182,7 +182,7 @@ export function TemplateFormModal({ onClose, onCreated }: { onClose: () => void;
             <div>
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-ink-soft">Mensaje</label>
-                <button type="button" onClick={insertVariable} className="flex items-center gap-1 text-xs text-pepper-600 hover:underline">
+                <button type="button" onClick={insertVariable} className="flex items-center gap-1 text-xs text-action-600 hover:underline">
                   <Plus className="w-3 h-3" /> Insertar variable
                 </button>
               </div>
@@ -191,7 +191,7 @@ export function TemplateFormModal({ onClose, onCreated }: { onClose: () => void;
                 onChange={e => setBody(e.target.value)}
                 rows={6}
                 placeholder="Hola {{1}} 👋 Tenemos listo tu pedido de {{2}}…"
-                className="mt-1 w-full text-sm border border-brand-100 rounded-lg px-3 py-2 resize-y focus:outline-none focus:ring-1 focus:ring-pepper-500 focus:border-pepper-600"
+                className="mt-1 w-full text-sm border border-brand-100 rounded-lg px-3 py-2 resize-y focus:outline-none focus:ring-1 focus:ring-action-500 focus:border-action-600"
               />
               <div className="flex items-center justify-between mt-1">
                 {bodyError ? (
@@ -226,12 +226,12 @@ export function TemplateFormModal({ onClose, onCreated }: { onClose: () => void;
             {/* Pie (opcional) */}
             <div>
               <label className="text-sm font-medium text-ink-soft">Pie de página <span className="text-ink-muted font-normal">· opcional</span></label>
-              <Input value={footer} onChange={e => setFooter(e.target.value)} placeholder="Fem · Bienestar íntimo" className="mt-1" maxLength={60} />
+              <Input value={footer} onChange={e => setFooter(e.target.value)} placeholder="Gracias por tu compra" className="mt-1" maxLength={60} />
             </div>
           </div>
 
           {/* Vista previa */}
-          <div className="p-6 bg-[#EDE4DC]/40">
+          <div className="p-6 bg-[#E3E9F4]/40">
             <p className="text-xs font-medium text-ink-muted mb-3">Vista previa</p>
             <div className="rounded-xl bg-[#E7FFDB] shadow-sm p-3 relative">
               <div className="absolute -left-1.5 top-3 w-3 h-3 bg-[#E7FFDB] rotate-45" />

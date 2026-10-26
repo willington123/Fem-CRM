@@ -3,15 +3,15 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Fem CRM',
-    template: '%s · Fem CRM',
+    default: 'Konnexa',
+    template: '%s · Konnexa',
   },
-  description: 'CRM de Fem — bandeja omnicanal, pedidos, flujos automáticos y retención.',
+  description: 'Konnexa — CRM conversacional: bandeja de WhatsApp, Instagram y Facebook, pedidos y flujos automáticos.',
   robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FF9DA3',
+  themeColor: '#015EF7',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

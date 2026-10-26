@@ -1,7 +1,7 @@
 /**
  * Crea la primera usuaria administradora del CRM.
  *
- *   ./_run.sh npx tsx scripts/seed-admin.ts hola@fem.com.co "Mateo Vera" 'unaClaveLarga'
+ *   ./_run.sh npx tsx scripts/seed-admin.ts tu@correo.com "Tu Nombre" 'unaClaveLarga'
  *
  * El login del CRM valida contra Supabase Auth y luego busca la fila en
  * `crm_users`. Hacen falta las dos: este script crea ambas y las enlaza por

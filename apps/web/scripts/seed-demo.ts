@@ -26,10 +26,10 @@ const DAY = 86_400_000;
 const ago = (d: number) => new Date(Date.now() - d * DAY);
 
 const PRODUCTOS = [
-  { name: 'Probiótico Vaginal Fem · 30 cápsulas', price: 129_000 },
-  { name: 'Probiótico Vaginal Fem · Duo pack',    price: 219_000 },
-  { name: 'Kit Bienestar Fem',                    price: 189_000 },
-  { name: 'Gel Íntimo Fem',                       price:  89_000 },
+  { name: 'Sérum facial · 30 ml', price: 129_000 },
+  { name: 'Sérum facial · Duo pack',    price: 219_000 },
+  { name: 'Kit de cuidado diario',                    price: 189_000 },
+  { name: 'Gel hidratante',                       price:  89_000 },
 ];
 
 const CLIENTAS = [
@@ -60,7 +60,7 @@ const TRANSPORTADORAS = ['Interrapidísimo', 'Servientrega', 'Envía', 'Coordina
 
 const PLANTILLAS = [
   { name: 'pedido_por_confirmar',   cat: 'CONFIRMATION', body: 'Hola {{1}} 💗 Recibimos tu pedido de {{2}}. Lo enviamos a {{3}}, {{4}}. ¿Confirmamos el despacho?' },
-  { name: 'pedido_despachado',      cat: 'LOGISTICS',    body: '¡Tu pedido Fem ya salió! 📦 Guía {{1}} con {{2}}. Te avisamos en cada paso.' },
+  { name: 'pedido_despachado',      cat: 'LOGISTICS',    body: '¡Tu pedido ya salió! 📦 Guía {{1}} con {{2}}. Te avisamos en cada paso.' },
   { name: 'pedido_en_transito',     cat: 'LOGISTICS',    body: '{{1}}, tu pedido va en camino 🚚 Guía {{2}} · {{3}}.' },
   { name: 'pedido_en_reparto',      cat: 'LOGISTICS',    body: '{{1}}, hoy te entregan 💗 Ten el teléfono a la mano.' },
   { name: 'pedido_entrega_oficina', cat: 'LOGISTICS',    body: '{{1}}, tu pedido quedó en oficina de {{2}}. Reclámalo con tu documento y la guía {{3}}.' },
@@ -97,7 +97,7 @@ const CHARLAS: { idx: number; canal: 'WHATSAPP' | 'INSTAGRAM' | 'FACEBOOK'; leid
   {
     idx: 3, canal: 'WHATSAPP', leida: true, tags: ['confirmado-whatsapp'],
     msgs: [
-      ['Hola Sara 💗 Recibimos tu pedido de Probiótico Vaginal Fem · 30 cápsulas.', 'OUT', 2.4],
+      ['Hola Sara 💗 Recibimos tu pedido de Sérum facial · 30 ml.', 'OUT', 2.4],
       ['Confirmar pedido', 'IN', 2.2],
       ['¡Listo! Ya lo dejamos en alistamiento 💗', 'OUT', 2.15],
     ],

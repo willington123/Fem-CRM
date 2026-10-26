@@ -106,33 +106,33 @@
 
 @layer base {
   :root {
-    /* Rosa Melocotón #FF9DA3 · Rojo Pimiento #ED5340 — ver tailwind.config.ts */
-    --background: 7 100% 98%;      /* #FFF8F7 crema cálida */
-    --foreground: 5 39% 13%;       /* #2E1614 */
+    /* Azul Konnexa #015EF7 · Verde Konnexa #0ACA62 — ver tailwind.config.ts */
+    --background: 220 60% 98%;     /* #F6F8FC */
+    --foreground: 222 63% 12%;     /* #0B1630 */
     --card: 0 0% 100%;
-    --card-foreground: 5 39% 13%;
+    --card-foreground: 222 63% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 5 39% 13%;
-    --primary: 8 72% 48%;          /* #D33A22 pimiento oscurecido: AA con blanco */
+    --popover-foreground: 222 63% 12%;
+    --primary: 218 100% 42%;       /* #0050D6: AA con blanco */
     --primary-foreground: 0 0% 100%;
-    --secondary: 4 100% 97%;       /* #FFF0EF */
-    --secondary-foreground: 6 44% 25%;
-    --muted: 5 62% 96%;            /* #FBEFEE */
-    --muted-foreground: 8 16% 47%; /* #8C6B66 */
-    --accent: 358 100% 95%;        /* #FFE7E8 melocotón tenue */
-    --accent-foreground: 8 82% 39%;
-    --destructive: 8 82% 39%;      /* #B32812 */
+    --secondary: 220 100% 97%;     /* #F3F7FF */
+    --secondary-foreground: 222 30% 28%;
+    --muted: 220 45% 96%;          /* #F0F3FA */
+    --muted-foreground: 221 16% 47%; /* #66728C */
+    --accent: 220 100% 95%;        /* #E6EEFF */
+    --accent-foreground: 218 100% 35%;
+    --destructive: 0 72% 42%;      /* rojo: los errores no usan la marca */
     --destructive-foreground: 0 0% 100%;
-    --border: 6 45% 91%;           /* #F3E1DF */
-    --input: 6 40% 90%;
-    --ring: 7 83% 59%;             /* #ED5340 */
+    --border: 220 45% 92%;         /* #E3E9F4 */
+    --input: 220 40% 90%;
+    --ring: 217 99% 49%;           /* #015EF7 */
     --radius: 0.875rem;
 
     /* Marca, en hex, para usos puntuales fuera de Tailwind */
-    --fem-rosa:    #FF9DA3;
-    --fem-pimiento:#ED5340;
-    --fem-accion:  #D33A22;
-    --fem-tinta:   #2E1614;
+    --konnexa-azul:   #015EF7;
+    --konnexa-verde:  #0ACA62;
+    --konnexa-accion: #0050D6;
+    --konnexa-tinta:  #0B1630;
 
     /* Channel colors */
     --wa-bg: #E8F8F0;
@@ -155,7 +155,7 @@
 @layer base {
   * { @apply border-border; }
   body {
-    background-color: #FFF8F7;
+    background-color: #F6F8FC;
     @apply text-foreground antialiased;
     font-family: 'Montserrat', system-ui, sans-serif;
     font-size: 14px;
@@ -176,8 +176,8 @@
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #F0D4D2; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #FF9DA3; }
+::-webkit-scrollbar-thumb { background: #D5DEEE; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #6E9BFF; }
 
 /* ── Channel pills ── */
 .channel-wa { background: var(--wa-bg); color: var(--wa-text); border-color: var(--wa-border); }
@@ -187,23 +187,23 @@
 /* ── Chat bubbles ── */
 .bubble-in {
   background: white;
-  border: 1px solid #F3E1DF;
+  border: 1px solid #E3E9F4;
   border-radius: 16px 16px 16px 4px;
   padding: 11px 15px;
   box-shadow: 0 1px 2px rgba(46,22,20,0.05);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.6;
-  color: #2E1614;
+  color: #0B1630;
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
 }
 /* Saliente en Pimiento oscuro (paso "Dark" del manual): 6.5:1 con texto blanco.
-   El #ED5340 puro solo llega a 3.55:1 y no pasa AA a 14 px. */
+   El #015EF7 puro solo llega a 3.55:1 y no pasa AA a 14 px. */
 .bubble-out {
-  background: #B32812;
-  color: #FFF5F4;
+  background: #0041B0;
+  color: #F3F7FF;
   border-radius: 16px 16px 4px 16px;
   padding: 11px 15px;
   box-shadow: 0 1px 4px rgba(179,40,18,0.22);
@@ -233,7 +233,7 @@
   overflow: hidden;
   border-radius: 16px;
   background: white;
-  border: 1px solid #F7E4E2;
+  border: 1px solid #E3E9F4;
   padding: 20px;
   transition: box-shadow 0.2s ease;
 }
