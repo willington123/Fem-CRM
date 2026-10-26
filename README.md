@@ -22,4 +22,9 @@ Para verlo funcionando sin credenciales: `npm run preview`.
 
 Proyecto de Vercel con **Root Directory** en `apps/web`. Las variables de
 `apps/web/.env.example` van en Settings → Environment Variables. El cron
-`/api/cron/flows` (cada 10 minutos) ya está declarado en `apps/web/vercel.json`.
+`/api/cron/flows` está declarado en `apps/web/vercel.json` una vez al día, porque
+el plan gratuito de Vercel no permite más. Para que el recordatorio de
+confirmación salga a los 90 minutos, programa un servicio externo (por ejemplo
+cron-job.org) que llame cada 10 minutos a `https://TU-DOMINIO/api/cron/flows`
+con la cabecera `Authorization: Bearer <CRON_SECRET>`, o pasa a Vercel Pro y
+vuelve a poner `*/10 * * * *`.

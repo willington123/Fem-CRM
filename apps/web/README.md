@@ -94,9 +94,11 @@ src/
 **Los pedidos se toman en el chat.** En la bandeja, «Crear pedido» los registra;
 en **Pedidos** se les cambia el estado y se agrega la guía y la transportadora.
 Cada cambio de estado dispara el WhatsApp de su paso si ese flujo está encendido.
-`/api/cron/flows` corre cada 10 minutos y despacha lo programado (el recordatorio
-de confirmación a los 90 min y la escalada a una persona 2 h después); está
-declarado en `vercel.json`.
+`/api/cron/flows` despacha lo programado (el recordatorio de confirmación a los
+90 min y la escalada a una persona 2 h después). En `vercel.json` corre una vez
+al día, el máximo del plan gratuito de Vercel; para los tiempos reales hace falta
+llamarlo cada 10 minutos desde un servicio externo (cron-job.org, con la cabecera
+`Authorization: Bearer <CRON_SECRET>`) o usar Vercel Pro con `*/10 * * * *`.
 
 Las tablas `abandoned_carts` y `mastershop_guides` y las columnas `shopify_*`
 de `orders` vienen de integraciones anteriores: se conservan para no perder los
