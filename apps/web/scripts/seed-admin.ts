@@ -10,10 +10,14 @@
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 
-const [email, name, password] = process.argv.slice(2);
+const [rawEmail, name, argPassword] = process.argv.slice(2);
+const email = rawEmail?.trim().toLowerCase();
+// La contraseña puede llegar por variable de entorno (scripts/create-admin.sh)
+// para que no quede en el historial de la Terminal.
+const password = argPassword ?? process.env.ADMIN_PASSWORD;
 
 if (!email || !name || !password) {
-  console.error('Uso: npx tsx scripts/seed-admin.ts <email> <nombre> <contraseña>');
+  console.error('Uso: npm run create-admin   (o: npx tsx scripts/seed-admin.ts <email> <nombre> <contraseña>)');
   process.exit(1);
 }
 if (password.length < 8) {

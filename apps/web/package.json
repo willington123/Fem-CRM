@@ -10,6 +10,7 @@
     "db:push": "prisma db push",
     "preview": "./scripts/preview-local.sh",
     "seed:admin": "./_run.sh npx tsx scripts/seed-admin.ts",
+    "create-admin": "./scripts/create-admin.sh",
     "seed:flows": "./_run.sh npx tsx scripts/seed-flows.ts"
   },
   "dependencies": {
