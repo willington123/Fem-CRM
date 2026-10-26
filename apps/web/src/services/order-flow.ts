@@ -1,13 +1,11 @@
 import { prisma } from '@/lib/prisma';
 import { sendWhatsAppTemplate } from '@/services/whatsapp';
+import { appendStatusHistory } from '@/services/orders';
 
 /**
  * Motor del flujo de pedido: desde que la clienta compra hasta que le entregan.
- *
- * Mastershop manda el paso real en `eventName`, no en `id_status` (el 6 es un
- * paraguas que cubre tránsito, reparto, oficina y novedad). Además cada cambio
- * emite un segundo webhook genérico "Cambio de Estado del Pedido" que hay que
- * ignorar o todo saldría duplicado.
+ * Cada estado del pedido dispara su paso (plantilla de WhatsApp) si el flujo
+ * correspondiente está encendido en /flows.
  */
 export type FlowStep =
   | 'POR_CONFIRMAR'
@@ -19,43 +17,18 @@ export type FlowStep =
   | 'NOVEDAD'
   | 'DEVOLUCION';
 
-/** Paso del flujo a partir del evento de Mastershop. `null` = no dispara nada. */
-export function stepFromEvent(eventName?: string, idStatus?: number): FlowStep | null {
-  switch (eventName?.trim()) {
-    case 'Pedido Creado':       return 'POR_CONFIRMAR';
-    case 'Pedido Por Alistar':  return 'POR_ALISTAR';
-    case 'Pedido En Tránsito':  return 'EN_TRANSITO';
-    case 'Pedido En Reparto':   return 'EN_REPARTO';
-    case 'Pedido En Oficina':   return 'EN_OFICINA';
-    case 'Pedido Entregado':    return 'ENTREGADO';
-    case 'Pedido con Novedad':  return 'NOVEDAD';
-  }
-  // Devolución y cancelación solo llegan con el eventName genérico
-  if (idStatus === 10) return 'DEVOLUCION';
-  return null;
-}
-
-/**
- * Estado del pedido en el CRM. Ojo: el mapeo anterior estaba invertido
- * (6→RETURNED, 8→IN_TRANSIT, 9→IN_TRANSIT, 10→FAILED_DELIVERY). Verificado
- * contra 1.894 webhooks y 300 pedidos de la API: 1,2=Por Confirmar ·
- * 3=Por Alistar · 4=Por Recolectar · 6=En Tránsito · 8=Entregada ·
- * 9=Cancelada · 10=Devuelta.
- */
-export function idStatusToCrm(idStatus?: number, eventName?: string): string | undefined {
-  if (eventName?.trim() === 'Pedido En Oficina')  return 'IN_DESTINATION';
-  if (eventName?.trim() === 'Pedido con Novedad') return 'FAILED_DELIVERY';
-
-  switch (idStatus) {
-    case 1:
-    case 2:  return 'PENDING_CONFIRMATION';
-    case 3:
-    case 4:  return 'PREPARING';
-    case 6:  return 'IN_TRANSIT';
-    case 8:  return 'DELIVERED';
-    case 9:  return 'CANCELLED';
-    case 10: return 'RETURNED';
-    default: return undefined;
+/** Paso del flujo que corresponde a un estado del pedido. `null` = no manda nada. */
+export function stepForStatus(status: string): FlowStep | null {
+  switch (status) {
+    case 'PENDING_CONFIRMATION': return 'POR_CONFIRMAR';
+    case 'DISPATCHED':           return 'POR_ALISTAR';
+    case 'IN_TRANSIT':           return 'EN_TRANSITO';
+    case 'OUT_FOR_DELIVERY':     return 'EN_REPARTO';
+    case 'IN_DESTINATION':       return 'EN_OFICINA';
+    case 'DELIVERED':            return 'ENTREGADO';
+    case 'FAILED_DELIVERY':      return 'NOVEDAD';
+    case 'RETURNED':             return 'DEVOLUCION';
+    default:                     return null;
   }
 }
 
@@ -97,23 +70,18 @@ interface OrderContext {
 function buildContext(order: any): OrderContext {
   const items = Array.isArray(order.items) ? order.items : [];
   const addr  = (order.shippingAddress ?? {}) as Record<string, string>;
-  // La transportadora vive en la guía de Mastershop, no en el pedido.
-  const guide = order.mastershopGuides?.[0];
 
   return {
     firstName: (order.customer?.name ?? '').trim().split(/\s+/)[0] || 'Hola',
     product:   items[0]?.name?.trim() || items[0]?.name_product?.trim() || 'tu pedido Fem',
     address:   addr.address || addr.address1 || 'la dirección registrada',
     city:      addr.city || order.customer?.city || 'tu ciudad',
-    guide:     order.trackingNumber || guide?.guideNumber || 'la guía asignada',
-    carrier:   guide?.carrier || 'la transportadora',
+    guide:     order.trackingNumber || 'la guía asignada',
+    carrier:   order.carrier || 'la transportadora',
   };
 }
 
-const ORDER_WITH_CONTEXT = {
-  customer: true,
-  mastershopGuides: { orderBy: { createdAt: 'desc' as const }, take: 1 },
-} as const;
+const ORDER_WITH_CONTEXT = { customer: true } as const;
 
 /** Plantillas que manda cada paso, en orden. El paso 6 manda dos. */
 function templatesForStep(step: FlowStep, c: OrderContext): { name: string; params: string[] }[] {
@@ -145,29 +113,36 @@ function templatesForStep(step: FlowStep, c: OrderContext): { name: string; para
  * Ejecuta un paso para un pedido: valida que el flujo esté activo, que no se
  * haya mandado ya, envía las plantillas y deja registro en FlowExecution.
  */
-export async function runStep(orderId: string, step: FlowStep): Promise<void> {
+/**
+ * Qué pasó al ejecutar un paso, para poder contárselo a quien cambió el pedido:
+ * sent · failed · off (flujo apagado o sin crear) · already (ya se mandó) ·
+ * no_guide (falta la guía) · no_phone.
+ */
+export type StepResult = 'sent' | 'failed' | 'off' | 'already' | 'no_guide' | 'no_phone';
+
+export async function runStep(orderId: string, step: FlowStep): Promise<StepResult> {
   const flow = await prisma.flowTemplate.findFirst({
     where: { trigger: STEP_TRIGGER[step] as any },
   });
-  if (!flow) { console.warn(`[Flujo] Sin FlowTemplate para ${step} — no se envía`); return; }
-  if (!flow.isActive) return;
+  if (!flow) { console.warn(`[Flujo] Sin FlowTemplate para ${step} — no se envía`); return 'off'; }
+  if (!flow.isActive) return 'off';
 
-  // Anti-duplicados: Mastershop reenvía eventos y el sync horario puede repetir.
+  // Anti-duplicados: un pedido puede volver a un estado por el que ya pasó.
   const already = await prisma.flowExecution.findFirst({
     where: { orderId, flowTemplateId: flow.id, status: { in: ['sent', 'running'] } },
   });
-  if (already) return;
+  if (already) return 'already';
 
   const order = await prisma.order.findUnique({ where: { id: orderId }, include: ORDER_WITH_CONTEXT });
-  if (!order?.customer?.phone) return;
+  if (!order?.customer?.phone || !order.customer.phone.startsWith('+')) return 'no_phone';
 
-  // Los pasos que citan el número de guía no salen hasta que Mastershop la
-  // genere: mejor no mandar nada que mandar "la guía asignada". Sin marcar
-  // ejecución, así el siguiente evento del pedido vuelve a intentarlo.
-  const guide = order.trackingNumber || order.mastershopGuides?.[0]?.guideNumber;
+  // Los pasos que citan el número de guía no salen sin guía: mejor no mandar
+  // nada que mandar "la guía asignada". Sin marcar ejecución, así el siguiente
+  // cambio del pedido (cuando ya tenga guía) vuelve a intentarlo.
+  const guide = order.trackingNumber;
   if (!guide && (['POR_ALISTAR', 'EN_TRANSITO', 'EN_OFICINA'] as FlowStep[]).includes(step)) {
     console.warn(`[Flujo] ${step} aplazado para el pedido ${orderId}: aún sin guía`);
-    return;
+    return 'no_guide';
   }
 
   const execution = await prisma.flowExecution.create({
@@ -187,6 +162,8 @@ export async function runStep(orderId: string, step: FlowStep): Promise<void> {
   for (const tpl of templatesForStep(step, ctx)) {
     try {
       const res = await sendWhatsAppTemplate(order.customer.phone, tpl.name, 'es', tpl.params);
+      // Sin credenciales la función no manda nada y devuelve null: eso no es un envío.
+      if (!res) throw new Error('WhatsApp no está configurado');
       sent.push(tpl.name);
       await recordOutbound(order.customerId, tpl.name, tpl.params, res?.messages?.[0]?.id);
     } catch (e) {
@@ -209,6 +186,8 @@ export async function runStep(orderId: string, step: FlowStep): Promise<void> {
   if (step === 'POR_CONFIRMAR' && !failure) {
     await scheduleConfirmationReminder(orderId, order.customerId);
   }
+
+  return failure ? 'failed' : 'sent';
 }
 
 /** Deja el mensaje saliente en la conversación para que se vea en la bandeja. */
@@ -285,11 +264,17 @@ export async function handleConfirmationButton(customerId: string, buttonText: s
   if (text.startsWith('confirmar')) {
     await prisma.order.update({
       where: { id: order.id },
-      data: { confirmedAt: new Date() },
+      data: {
+        confirmedAt: new Date(),
+        ...(order.status === 'PENDING_CONFIRMATION' && {
+          status: 'CONFIRMED',
+          statusHistory: appendStatusHistory(order.statusHistory, {
+            status: 'CONFIRMED', source: 'whatsapp-boton', changedAt: new Date().toISOString(),
+          }),
+        }),
+      },
     });
     await sendAndRecord(order, 'confirmacion_recibida', []);
-    // Mastershop no acepta escritura de estado: queda marcado en el CRM y
-    // etiquetado para que alguien lo mueva a "Por Alistar" en su panel.
     await tagCustomer(customerId, 'confirmado-whatsapp');
     return true;
   }

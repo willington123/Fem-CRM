@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { getJwtSecret } from '@/lib/secrets';
 import { prisma } from '@/lib/prisma';
 
 const BASE_URL = 'https://graph.facebook.com/v23.0';
@@ -103,7 +104,7 @@ export async function attachMediaToMessage(
 export function signMediaToken(messageId: string, ttlSeconds = 6 * 60 * 60): string {
   const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
   const sig = crypto
-    .createHmac('sha256', process.env.JWT_SECRET || 'secret')
+    .createHmac('sha256', getJwtSecret())
     .update(`${messageId}.${exp}`)
     .digest('base64url');
   return `${exp}.${sig}`;
@@ -116,7 +117,7 @@ export function verifyMediaToken(messageId: string, token: string | null): boole
   if (!exp || !sig || exp < Math.floor(Date.now() / 1000)) return false;
 
   const expected = crypto
-    .createHmac('sha256', process.env.JWT_SECRET || 'secret')
+    .createHmac('sha256', getJwtSecret())
     .update(`${messageId}.${exp}`)
     .digest('base64url');
 

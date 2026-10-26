@@ -1,7 +1,7 @@
 # Fem-CRM
 
 CRM omnicanal de Fem: bandeja de WhatsApp / Instagram / Facebook, seguimiento de
-pedidos de Mastershop y Shopify, flujos automáticos de mensajes y analítica.
+pedidos tomados por WhatsApp, flujos automáticos de mensajes y analítica.
 
 Next.js 14 (App Router) · Prisma · PostgreSQL en Supabase · Tailwind · desplegado en Vercel.
 
@@ -21,6 +21,5 @@ Para verlo funcionando sin credenciales: `npm run preview`.
 ## Despliegue en Vercel
 
 Proyecto de Vercel con **Root Directory** en `apps/web`. Las variables de
-`apps/web/.env.example` van en Settings → Environment Variables. Los dos crons
-(`/api/cron/sync` cada hora y `/api/cron/flows` cada 10 minutos) ya están
-declarados en `apps/web/vercel.json`.
+`apps/web/.env.example` van en Settings → Environment Variables. El cron
+`/api/cron/flows` (cada 10 minutos) ya está declarado en `apps/web/vercel.json`.

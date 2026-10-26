@@ -2,11 +2,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Search, Send, Lock, MessageSquare, Instagram, Facebook,
-  Clock, CheckCheck, AlertCircle, ChevronRight, Loader2, X
+  Clock, CheckCheck, AlertCircle, ChevronRight, Loader2, X, ShoppingBag
 } from 'lucide-react';
 import { cn, formatRelativeTime } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { MediaBubble } from '@/components/media-bubble';
+import { CreateOrderModal } from '@/components/create-order-modal';
 
 type Channel  = 'WHATSAPP' | 'INSTAGRAM' | 'FACEBOOK';
 type ConvStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED';
@@ -152,6 +153,7 @@ export default function InboxPage() {
   const [showTpl,  setShowTpl]  = useState(false);
   const [tplIndex, setTplIndex] = useState(0);
   const [armed,    setArmed]    = useState<{ tpl: Template; params: string[] } | null>(null);
+  const [showOrder, setShowOrder] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
@@ -505,6 +507,12 @@ export default function InboxPage() {
               {sel.agent && <span className="text-sm text-[#D33A22] font-medium">· Atiende {sel.agent.name}</span>}
             </div>
           </div>
+          <button
+            onClick={() => setShowOrder(true)}
+            className="shrink-0 flex items-center gap-1.5 bg-pepper-600 hover:bg-pepper-700 text-white px-3.5 h-9 rounded-xl text-sm font-semibold transition-colors"
+          >
+            <ShoppingBag className="w-4 h-4" /> Crear pedido
+          </button>
           <div className="flex gap-1.5 shrink-0">
             {sel.tags.map(t => (
               <span key={t} className="text-xs bg-brand-50 text-ink-soft px-2.5 py-1 rounded-lg font-medium">
@@ -793,6 +801,10 @@ export default function InboxPage() {
           <div>
             <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide mb-2">Acciones</p>
             <div className="space-y-1">
+              <button onClick={() => setShowOrder(true)}
+                className="w-full text-left text-sm text-ink-soft hover:text-ink hover:bg-brand-50 px-2.5 py-2 rounded-lg transition-colors">
+                Crear pedido
+              </button>
               <button onClick={markResolved} disabled={sel.status === 'RESOLVED'}
                 className="w-full text-left text-sm text-ink-soft hover:text-ink hover:bg-brand-50 disabled:opacity-40 px-2.5 py-2 rounded-lg transition-colors">
                 {sel.status === 'RESOLVED' ? 'Resuelta ✓' : 'Marcar resuelta'}
@@ -805,6 +817,16 @@ export default function InboxPage() {
           </div>
         </div>
       </div>
+      )}
+
+      {showOrder && sel && (
+        <CreateOrderModal
+          customerId={sel.customer.id}
+          conversationId={sel.id}
+          initial={{ name: sel.customer.name, phone: sel.customer.phone, city: sel.customer.city }}
+          onClose={() => setShowOrder(false)}
+          onCreated={() => { loadDetail(sel.id); loadConvs(); }}
+        />
       )}
     </div>
   );

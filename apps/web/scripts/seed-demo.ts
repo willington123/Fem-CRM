@@ -52,7 +52,7 @@ const CLIENTAS = [
 /** Distribución de estados parecida a la real: la mayoría entrega. */
 const ESTADOS = [
   'DELIVERED', 'DELIVERED', 'DELIVERED', 'DELIVERED', 'DELIVERED', 'DELIVERED',
-  'IN_TRANSIT', 'IN_TRANSIT', 'PREPARING', 'PENDING_CONFIRMATION',
+  'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DISPATCHED', 'CONFIRMED',
   'IN_DESTINATION', 'RETURNED', 'FAILED_DELIVERY', 'CANCELLED',
 ] as const;
 
@@ -160,12 +160,6 @@ async function main() {
   }
   console.log(`${clientas.length} clientas`);
 
-  const integration = await prisma.integrationConfig.upsert({
-    where: { platform_name: { platform: 'MASTERSHOP', name: 'Mastershop' } },
-    create: { platform: 'MASTERSHOP', name: 'Mastershop', isActive: true, lastSyncAt: new Date(Date.now() - 25 * 60_000) },
-    update: { lastSyncAt: new Date(Date.now() - 25 * 60_000) },
-  });
-
   // ── Pedidos repartidos en 60 días ──────────────────────────────────────
   let n = 0;
   for (let d = 59; d >= 0; d--) {
@@ -183,14 +177,13 @@ async function main() {
 
       const pedido = await prisma.order.create({
         data: {
-          shopifyOrderId: `demo-${n}`,
-          shopifyOrderNumber: `#${2400 + n}`,
+          orderNumber: `WA-DEMO-${String(n).padStart(3, '0')}`,
           customerId: cliente.id,
-          integrationId: integration.id,
           status: estado as any,
           totalAmount: producto.price * cantidad,
           currency: 'COP',
-          trackingNumber: estado === 'PENDING_CONFIRMATION' ? null : guia,
+          trackingNumber: ['PENDING_CONFIRMATION', 'CONFIRMED'].includes(estado) ? null : guia,
+          carrier: ['PENDING_CONFIRMATION', 'CONFIRMED'].includes(estado) ? null : TRANSPORTADORAS[n % TRANSPORTADORAS.length],
           shippingAddress: { address: `Calle ${10 + (n % 80)} # ${n % 60}-${n % 40}`, city: cliente.city },
           items: [{ name: producto.name, quantity: cantidad, price: producto.price }],
           statusHistory: [{ status: estado, changedAt: creado.toISOString() }],
@@ -199,23 +192,9 @@ async function main() {
         },
       });
 
-      // La fecha real la manda Mastershop; Prisma pondría la de creación.
+      // Fecha repartida en el pasado; Prisma pondría la de hoy.
       await prisma.$executeRaw`UPDATE orders SET created_at = ${creado}::timestamptz WHERE id = ${pedido.id}`;
 
-      if (estado !== 'PENDING_CONFIRMATION') {
-        await prisma.mastershopGuide.create({
-          data: {
-            guideNumber: guia,
-            orderId: pedido.id,
-            customerId: cliente.id,
-            carrier: TRANSPORTADORAS[n % TRANSPORTADORAS.length],
-            status: estado,
-            originCity: 'Medellín',
-            destinationCity: cliente.city,
-            lastSyncedAt: new Date(),
-          },
-        });
-      }
       n++;
     }
   }
@@ -227,7 +206,10 @@ async function main() {
       total_orders = s.cnt, ltv = s.ltv,
       first_purchase_at = s.first_at, last_purchase_at = s.last_at
     FROM (
-      SELECT customer_id, COUNT(*) cnt, SUM(total_amount) ltv,
+      -- Misma regla que recalcCustomer: lo cancelado no cuenta, lo devuelto no suma.
+      SELECT customer_id,
+             COUNT(*) FILTER (WHERE status <> 'CANCELLED') cnt,
+             COALESCE(SUM(total_amount) FILTER (WHERE status NOT IN ('CANCELLED', 'RETURNED')), 0) ltv,
              MIN(created_at) first_at, MAX(created_at) last_at
       FROM orders GROUP BY customer_id
     ) s WHERE s.customer_id = c.id
@@ -280,27 +262,6 @@ async function main() {
     }
   }
   console.log(`${CHARLAS.length} conversaciones`);
-
-  // ── Carritos abandonados ───────────────────────────────────────────────
-  for (let i = 0; i < 5; i++) {
-    const cliente  = clientas[(i * 3) % clientas.length];
-    const producto = PRODUCTOS[i % PRODUCTOS.length];
-    await prisma.abandonedCart.create({
-      data: {
-        shopifyCheckoutId: `demo-cart-${i}`,
-        customerId: cliente.id,
-        email: cliente.email,
-        phone: cliente.phone,
-        status: i === 4 ? 'RECOVERED' : 'OPEN',
-        checkoutUrl: `https://fem.com.co/checkout/demo-${i}`,
-        totalAmount: producto.price,
-        lineItems: [{ name: producto.name, quantity: 1, price: producto.price }],
-        reminderCount: i % 3,
-        abandonedAt: ago(i * 0.7 + 0.2),
-      },
-    });
-  }
-  console.log('5 carritos abandonados');
 
   console.log('\nDatos de demostración listos.');
 }

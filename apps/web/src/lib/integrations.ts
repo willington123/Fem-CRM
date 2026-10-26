@@ -9,7 +9,7 @@
  * Los secretos no salen del servidor.
  */
 
-export type PlatformKey = 'DATABASE' | 'APP' | 'MASTERSHOP' | 'META' | 'SHOPIFY';
+export type PlatformKey = 'DATABASE' | 'APP' | 'META';
 
 export interface EnvVarSpec {
   name: string;
@@ -52,24 +52,10 @@ export const PLATFORMS: PlatformSpec[] = [
     where: 'Las generas tú: openssl rand -base64 48',
     vars: [
       { name: 'JWT_SECRET',          required: true,  help: 'Cadena aleatoria larga: firma la sesión y los enlaces temporales de adjuntos.' },
-      { name: 'CRON_SECRET',         required: true,  help: 'Sin ella, cualquiera puede disparar /api/cron/* desde fuera.' },
+      { name: 'CRON_SECRET',         required: true,  help: 'Protege /api/cron/*. Sin ella los crons se rechazan y no corren.' },
       { name: 'NEXT_PUBLIC_APP_URL', required: false, help: 'Dominio público del CRM. Si falta, se deduce del de Vercel.' },
     ],
     webhooks: [],
-  },
-  {
-    key: 'MASTERSHOP',
-    label: 'Mastershop',
-    purpose: 'Origen de los pedidos, las guías y los estados de envío.',
-    where: 'Mastershop → Configuración → Integraciones / API',
-    vars: [
-      { name: 'MASTERSHOP_API_KEY',        required: true,  help: 'Se envía como cabecera ms-api-key en cada llamada.' },
-      { name: 'MASTERSHOP_WEBHOOK_SECRET', required: false, help: 'Valida que el webhook viene de Mastershop.' },
-      { name: 'MASTERSHOP_API_URL',        required: false, help: 'Solo si usan un host distinto al de producción.' },
-    ],
-    webhooks: [
-      { path: '/api/webhooks/mastershop', note: 'Eventos de pedido: creado, por alistar, en tránsito, entregado, novedad, devuelto.' },
-    ],
   },
   {
     key: 'META',
@@ -86,21 +72,6 @@ export const PLATFORMS: PlatformSpec[] = [
     ],
     webhooks: [
       { path: '/api/webhooks/meta', note: 'Suscribir a messages y message_status. Usa el mismo verify token.' },
-    ],
-  },
-  {
-    key: 'SHOPIFY',
-    label: 'Shopify',
-    purpose: 'Pedidos y carritos abandonados de la tienda.',
-    where: 'Shopify admin → Settings → Apps and sales channels → Develop apps',
-    vars: [
-      { name: 'SHOPIFY_SHOP_DOMAIN',   required: true,  help: 'Por ejemplo fem-co.myshopify.com' },
-      { name: 'SHOPIFY_ACCESS_TOKEN',  required: true,  help: 'Admin API access token (empieza por shpat_).' },
-      { name: 'SHOPIFY_WEBHOOK_SECRET', required: true, help: 'Clave de firma de los webhooks. Sin ella no se puede validar el origen.' },
-    ],
-    webhooks: [
-      { path: '/api/webhooks/shopify/orders/create',    note: 'Evento orders/create.' },
-      { path: '/api/webhooks/shopify/orders/fulfilled', note: 'Evento orders/fulfilled.' },
     ],
   },
 ];

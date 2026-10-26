@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   MessageSquare, Users, ShoppingBag, BarChart3, Zap,
-  FileText, LogOut, ShoppingCart, Settings
+  FileText, LogOut, Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { clearAuth, getUser, AuthUser } from '@/lib/auth';
@@ -19,19 +19,18 @@ const navItems = [
   { href: '/inbox',           icon: MessageSquare, label: 'Bandeja',    badge: 'inbox'  as const },
   { href: '/customers',       icon: Users,         label: 'Clientas',   badge: null },
   { href: '/orders',          icon: ShoppingBag,   label: 'Pedidos',    badge: 'orders' as const },
-  { href: '/abandoned-carts', icon: ShoppingCart,  label: 'Carritos',   badge: 'carts'  as const },
   { href: '/flows',           icon: Zap,           label: 'Flujos',     badge: null },
   { href: '/templates',       icon: FileText,      label: 'Plantillas', badge: null },
   { href: '/settings',        icon: Settings,      label: 'Ajustes',    badge: null },
 ];
 
-type Badges = { inbox: number; carts: number; orders: number };
+type Badges = { inbox: number; orders: number };
 
 export function Sidebar() {
   const pathname = usePathname();
   const router   = useRouter();
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [badges, setBadges] = useState<Badges>({ inbox: 0, carts: 0, orders: 0 });
+  const [badges, setBadges] = useState<Badges>({ inbox: 0, orders: 0 });
 
   useEffect(() => { setUser(getUser()); }, []);
 

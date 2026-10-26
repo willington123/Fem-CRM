@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/prisma';
 import { createServerSupabase } from '@/lib/supabase-server';
+import { getJwtSecret } from '@/lib/secrets';
 
 /**
  * Vista previa local sin Supabase.
@@ -20,7 +21,7 @@ function devLoginAllowed(): boolean {
 function issue(user: { id: string; email: string; role: string; name: string; avatar: string | null }) {
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'secret',
+    getJwtSecret(),
     { expiresIn: '7d' },
   );
   return NextResponse.json({

@@ -190,7 +190,7 @@ export default function CustomerProfilePage() {
                   {customer.orders.map((order: any) => (
                     <div key={order.id} className="flex items-center justify-between p-4 bg-brand-50 rounded-xl border border-brand-100">
                       <div>
-                        <p className="font-semibold text-sm text-ink">{order.shopifyOrderNumber || order.id.slice(0, 8)}</p>
+                        <p className="font-semibold text-sm text-ink">{order.orderNumber || order.id.slice(0, 8)}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">{formatDate(order.createdAt)}</p>
                       </div>
                       <span className={cn('px-2.5 py-1 rounded-full text-xs font-medium', ORDER_STATUS_COLORS[order.status])}>

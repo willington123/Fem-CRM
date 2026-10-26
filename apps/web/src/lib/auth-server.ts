@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { prisma } from './prisma';
+import { getJwtSecret } from './secrets';
 
 export interface AuthUser {
   id: string;
@@ -14,7 +15,7 @@ export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
   if (!token) return null;
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
+    const payload = jwt.verify(token, getJwtSecret()) as any;
     const user = await prisma.crmUser.findUnique({ where: { id: payload.id } });
     if (!user || !user.isActive) return null;
     return { id: user.id, email: user.email, role: user.role, name: user.name };

@@ -48,8 +48,6 @@ export default function SettingsPage() {
   const [error, setError]   = useState('');
   const [tests, setTests]   = useState<Record<string, TestState>>({});
   const [open, setOpen]     = useState<Record<string, boolean>>({});
-  const [syncing, setSyncing]     = useState(false);
-  const [syncResult, setSyncResult] = useState<string>('');
 
   const load = () =>
     api.get<StatusPayload>('/api/integrations/status')
@@ -65,20 +63,6 @@ export default function SettingsPage() {
       setTests(t => ({ ...t, [key]: { loading: false, ok: r.ok, detail: r.detail } }));
     } catch (e: any) {
       setTests(t => ({ ...t, [key]: { loading: false, ok: false, detail: e.message || 'Falló la prueba' } }));
-    }
-  }
-
-  async function runSync() {
-    setSyncing(true);
-    setSyncResult('');
-    try {
-      const r = await api.post<any>('/api/sync/mastershop', { days: 30 });
-      setSyncResult(`${r.total} pedidos revisados · ${r.created} nuevos · ${r.updated} actualizados${r.errors ? ` · ${r.errors} con error` : ''}`);
-      load();
-    } catch (e: any) {
-      setSyncResult(e.message || 'Falló la sincronización');
-    } finally {
-      setSyncing(false);
     }
   }
 
@@ -174,16 +158,6 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    {p.key === 'MASTERSHOP' && p.ready && (
-                      <button
-                        onClick={runSync}
-                        disabled={syncing}
-                        className="flex items-center gap-1.5 bg-pepper-600 hover:bg-pepper-700 disabled:opacity-60 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                      >
-                        {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                        Sincronizar
-                      </button>
-                    )}
                     <button
                       onClick={() => runTest(p.key)}
                       disabled={test?.loading}
@@ -205,12 +179,6 @@ export default function SettingsPage() {
                   )}>
                     {test.ok ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-px" /> : <XCircle className="w-3.5 h-3.5 shrink-0 mt-px" />}
                     <span className="leading-relaxed">{test.detail}</span>
-                  </div>
-                )}
-
-                {p.key === 'MASTERSHOP' && syncResult && (
-                  <div className="mt-2 text-xs rounded-xl px-3 py-2 border bg-brand-50 border-brand-200 text-ink-soft">
-                    {syncResult}
                   </div>
                 )}
 

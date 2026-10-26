@@ -39,7 +39,7 @@ async function testApp(): Promise<TestResult> {
   else if (jwt.length < 32) problemas.push('JWT_SECRET es demasiado corto (usa 48 bytes aleatorios)');
   else if (/^(secret|changeme|demo|test|preview)/i.test(jwt)) problemas.push('JWT_SECRET parece de ejemplo');
 
-  if (!cron) problemas.push('falta CRON_SECRET: los crons quedan abiertos a cualquiera');
+  if (!cron) problemas.push('falta CRON_SECRET: los crons se rechazan y no corren');
 
   if (process.env.ALLOW_DEV_LOGIN === 'true') {
     problemas.push('ALLOW_DEV_LOGIN está activo (inofensivo aquí porque la base no es local, pero sobra)');
@@ -48,29 +48,6 @@ async function testApp(): Promise<TestResult> {
   return problemas.length
     ? { ok: false, detail: problemas.join(' · ') }
     : { ok: true, detail: 'Secretos presentes y con longitud suficiente.' };
-}
-
-async function testMastershop(): Promise<TestResult> {
-  const key = process.env.MASTERSHOP_API_KEY;
-  if (!key) return { ok: false, detail: 'Falta MASTERSHOP_API_KEY.' };
-
-  const base = process.env.MASTERSHOP_API_URL || 'https://prod.api.mastershop.com/api';
-  try {
-    const res = await fetch(`${base}/orders/list?page=1&limit=1`, {
-      method: 'POST',
-      headers: { 'ms-api-key': key, 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-    });
-    if (res.status === 401 || res.status === 403) {
-      return { ok: false, detail: 'La API rechazó la llave (401/403). Genera una nueva en Mastershop.' };
-    }
-    if (!res.ok) return { ok: false, detail: `La API respondió ${res.status}.` };
-    const data = await res.json();
-    const n = Array.isArray(data) ? data.length : 0;
-    return { ok: true, detail: n > 0 ? 'Responde y devuelve pedidos.' : 'Responde, pero sin pedidos en la ventana por defecto.' };
-  } catch (e: any) {
-    return { ok: false, detail: `No se pudo alcanzar la API: ${e.message ?? 'error de red'}.` };
-  }
 }
 
 async function testMeta(): Promise<TestResult> {
@@ -103,34 +80,10 @@ async function testMeta(): Promise<TestResult> {
   }
 }
 
-async function testShopify(): Promise<TestResult> {
-  const domain = process.env.SHOPIFY_SHOP_DOMAIN;
-  const token  = process.env.SHOPIFY_ACCESS_TOKEN;
-  if (!domain) return { ok: false, detail: 'Falta SHOPIFY_SHOP_DOMAIN.' };
-  if (!token)  return { ok: false, detail: 'Falta SHOPIFY_ACCESS_TOKEN.' };
-
-  const host = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
-  try {
-    const res = await fetch(`https://${host}/admin/api/2024-10/shop.json`, {
-      headers: { 'X-Shopify-Access-Token': token },
-    });
-    if (res.status === 401 || res.status === 403) {
-      return { ok: false, detail: 'Shopify rechazó el token. Revisa los scopes de la app privada.' };
-    }
-    if (!res.ok) return { ok: false, detail: `Shopify respondió ${res.status}. Revisa el dominio.` };
-    const data = await res.json();
-    return { ok: true, detail: `Conectada a "${data.shop?.name ?? host}".` };
-  } catch (e: any) {
-    return { ok: false, detail: `No se pudo alcanzar la tienda: ${e.message ?? 'error de red'}.` };
-  }
-}
-
 const TESTS: Record<PlatformKey, () => Promise<TestResult>> = {
   DATABASE:   testDatabase,
   APP:        testApp,
-  MASTERSHOP: testMastershop,
   META:       testMeta,
-  SHOPIFY:    testShopify,
 };
 
 export async function POST(req: NextRequest) {

@@ -23,7 +23,7 @@ const FLOWS = [
   {
     trigger: 'ORDER_DISPATCHED',
     name: 'Paso 2 · Por alistar',
-    description: 'Cuando Mastershop genera la guía envía pedido_despachado con el número y la transportadora.',
+    description: 'Cuando el pedido pasa a Despachado con su guía, envía pedido_despachado con el número y la transportadora.',
     steps: [{ type: 'template', template: 'pedido_despachado', params: ['guia', 'transportadora'] }],
   },
   {

@@ -17,7 +17,8 @@ const ORDER_STATUS_ES: Record<string, string> = {
   PENDING_CONFIRMATION: 'Por confirmar',
   PREPARING:            'Por alistar',
   IN_TRANSIT:           'En camino',
-  IN_DESTINATION:       'En ciudad destino',
+  OUT_FOR_DELIVERY:     'En reparto',
+  IN_DESTINATION:       'En oficina',
   DELIVERED:            'Entregados',
   RETURNED:             'Devueltos',
   CANCELLED:            'Cancelados',
@@ -136,7 +137,7 @@ export default function DashboardPage() {
     const get = (s: string) => ordersByStatus.find(x => x.status === s)?.count ?? 0;
     return [
       { label: 'Creados',    value: totalOrders },
-      { label: 'En camino',  value: get('IN_TRANSIT') + get('IN_DESTINATION') },
+      { label: 'En camino',  value: get('IN_TRANSIT') + get('OUT_FOR_DELIVERY') + get('IN_DESTINATION') },
       { label: 'Entregados', value: sales?.deliveredOrders ?? 0 },
       { label: 'Devueltos',  value: sales?.returnedOrders ?? 0 },
     ];
@@ -151,7 +152,7 @@ export default function DashboardPage() {
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <div className="mr-auto">
             <h1 className="text-lg font-bold text-ink">Dashboard</h1>
-            <p className="text-sm text-ink-muted mt-0.5">Fem · datos de Mastershop</p>
+            <p className="text-sm text-ink-muted mt-0.5">Fem · ventas por WhatsApp</p>
           </div>
 
           <div className="flex items-center gap-1 bg-brand-50 rounded-lg p-1">

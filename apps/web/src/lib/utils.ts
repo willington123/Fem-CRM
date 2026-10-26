@@ -41,12 +41,13 @@ export const CHANNEL_LABELS: Record<string, string> = {
 };
 
 export const ORDER_STATUS_LABELS: Record<string, string> = {
-  PENDING_CONFIRMATION: 'Pendiente confirmación',
+  PENDING_CONFIRMATION: 'Por confirmar',
   CONFIRMED: 'Confirmado',
   PREPARING: 'En preparación',
   DISPATCHED: 'Despachado',
   IN_TRANSIT: 'En camino',
-  IN_DESTINATION: 'En ciudad destino',
+  OUT_FOR_DELIVERY: 'En reparto',
+  IN_DESTINATION: 'En oficina',
   DELIVERED: 'Entregado',
   FAILED_DELIVERY: 'Novedad',
   RETURNED: 'Devuelto',
@@ -59,6 +60,7 @@ export const ORDER_STATUS_COLORS: Record<string, string> = {
   PREPARING: 'bg-indigo-100 text-indigo-800',
   DISPATCHED: 'bg-purple-100 text-purple-800',
   IN_TRANSIT: 'bg-cyan-100 text-cyan-800',
+  OUT_FOR_DELIVERY: 'bg-sky-100 text-sky-800',
   IN_DESTINATION: 'bg-teal-100 text-teal-800',
   DELIVERED: 'bg-green-100 text-green-800',
   FAILED_DELIVERY: 'bg-red-100 text-red-800',
@@ -80,4 +82,14 @@ export const CUSTOMER_STATUS_COLORS: Record<string, string> = {
   AT_RISK: 'bg-orange-100 text-orange-700',
   RECURRING: 'bg-brand-100 text-pepper-700',
   LOST: 'bg-brand-50 text-ink-muted',
+};
+
+/** Qué pasó con el WhatsApp automático al crear o mover un pedido (ver runStep). */
+export const FLOW_RESULT_TEXT: Record<string, string> = {
+  sent:     'Se envió el WhatsApp automático de este paso.',
+  failed:   'No se pudo enviar el WhatsApp automático. Revisa la conexión de WhatsApp en Ajustes.',
+  off:      'El flujo de este paso está apagado: no se envió ningún mensaje.',
+  already:  'Este mensaje ya se le había enviado antes; no se repitió.',
+  no_guide: 'Falta el número de guía: el mensaje saldrá cuando lo agregues.',
+  no_phone: 'La clienta no tiene un número de WhatsApp válido: no se envió mensaje.',
 };

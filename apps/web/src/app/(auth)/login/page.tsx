@@ -75,8 +75,8 @@ export default function LoginPage() {
           <div className="flex gap-8">
             {[
               { value: 'WhatsApp', label: 'Instagram · Facebook' },
-              { value: 'Mastershop', label: 'Pedidos y guías' },
-              { value: 'Shopify',  label: 'Tienda y carritos' },
+              { value: 'Pedidos', label: 'Tomados en el chat' },
+              { value: 'Flujos',  label: 'Avisos de envío automáticos' },
             ].map(s => (
               <div key={s.value}>
                 <p className="text-ink font-bold text-[15px] leading-none">{s.value}</p>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkCronAuth } from '@/lib/secrets';
 import { processScheduled } from '@/services/order-flow';
 
 export const maxDuration = 60;
@@ -10,12 +11,8 @@ export const dynamic = 'force-dynamic';
  * minutos (vercel.json), que es precisión de sobra para esos tiempos.
  */
 export async function GET(req: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  const authHeader = req.headers.get('authorization');
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-  }
+  const denied = checkCronAuth(req.headers.get('authorization'));
+  if (denied) return denied;
 
   try {
     const result = await processScheduled();

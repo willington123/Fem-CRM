@@ -54,7 +54,7 @@ export default function CustomersPage() {
           <div>
             <h1 className="text-xl font-bold text-ink">Clientas</h1>
             <p className="text-sm text-muted-foreground">
-              {loading ? 'Cargando…' : `${customers.length} clientas registradas · sincronización automática con Mastershop`}
+              {loading ? 'Cargando…' : `${customers.length} clientas registradas`}
             </p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function CustomersPage() {
               ) : customers.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center text-sm text-ink-muted">
-                    No hay clientas todavía. Se importan automáticamente desde Mastershop.
+                    No hay clientas todavía. Se crean solas cuando te escriben por WhatsApp.
                   </td>
                 </tr>
               ) : (

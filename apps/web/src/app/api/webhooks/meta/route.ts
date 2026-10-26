@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { webhookSecret } from '@/lib/secrets';
 import { prisma } from '@/lib/prisma';
 import { markMessageRead } from '@/services/whatsapp';
 import { handleConfirmationButton } from '@/services/order-flow';
@@ -12,7 +13,8 @@ export async function GET(req: NextRequest) {
   const token     = searchParams.get('hub.verify_token');
   const challenge = searchParams.get('hub.challenge');
 
-  if (mode === 'subscribe' && token === process.env.META_WEBHOOK_VERIFY_TOKEN) {
+  const expected = webhookSecret('META_WEBHOOK_VERIFY_TOKEN');
+  if (mode === 'subscribe' && expected && token === expected) {
     return new NextResponse(challenge, { status: 200 });
   }
   return new NextResponse('Forbidden', { status: 403 });
@@ -38,8 +40,9 @@ export async function POST(req: NextRequest) {
 }
 
 function verifySignature(rawBody: string, signatureHeader: string | null): boolean {
-  const secret = process.env.META_APP_SECRET;
-  if (!secret) return true; // sin secreto configurado no hay forma de validar
+  // Sin secreto no hay forma de saber si el evento viene de Meta: se rechaza.
+  const secret = webhookSecret('META_APP_SECRET');
+  if (!secret) return false;
 
   if (!signatureHeader?.startsWith('sha256=')) return false;
   const received = signatureHeader.slice('sha256='.length);
@@ -56,6 +59,7 @@ async function processMetaEvent(body: any) {
   if (body.object !== 'whatsapp_business_account' && body.object !== 'page' && body.object !== 'instagram') return;
 
   for (const entry of body.entry || []) {
+    // WhatsApp llega en `entry.changes`.
     for (const change of entry.changes || []) {
       const value = change.value;
 
@@ -74,18 +78,29 @@ async function processMetaEvent(body: any) {
             .catch(e => console.error('[Meta webhook] Estado de mensaje:', e));
         }
       }
+    }
 
-      for (const messaging of entry.messaging || []) {
-        if (messaging.message) {
-          await handleIncomingInstagramFacebook(messaging, entry.id)
-            .catch(e => console.error('[Meta webhook] Entrante de IG/Messenger:', e));
-        }
+    // Instagram y Messenger llegan en `entry.messaging`, sin `changes`. Antes este
+    // bucle estaba dentro del de `changes` y por eso nunca se ejecutaba.
+    for (const messaging of entry.messaging || []) {
+      if (messaging.message) {
+        await handleIncomingInstagramFacebook(messaging, entry.id, body.object)
+          .catch(e => console.error('[Meta webhook] Entrante de IG/Messenger:', e));
       }
     }
   }
 }
 
+/** Meta reintenta el webhook si tarda en responder: un mismo mensaje puede llegar dos veces. */
+async function alreadyStored(externalId?: string): Promise<boolean> {
+  if (!externalId) return false;
+  const found = await prisma.message.findFirst({ where: { externalId }, select: { id: true } });
+  return !!found;
+}
+
 async function handleIncomingWhatsApp(message: any, contact: any) {
+  if (await alreadyStored(message.id)) return;
+
   const phone = `+${message.from}`;
   const info = describeIncoming(message);
   const { attachment } = info;
@@ -169,10 +184,18 @@ async function handleIncomingWhatsApp(message: any, contact: any) {
   }
 }
 
-async function handleIncomingInstagramFacebook(messaging: any, pageId: string) {
+async function handleIncomingInstagramFacebook(messaging: any, pageId: string, object: string) {
+  // Los mensajes que manda la propia página vuelven como "eco": no son de la clienta.
+  if (messaging.message?.is_echo) return;
+
+  const mid = messaging.message?.mid as string | undefined;
+  if (await alreadyStored(mid)) return;
+
   const senderId = messaging.sender.id;
   const content  = messaging.message?.text || '[Multimedia]';
-  const channel  = pageId === process.env.META_INSTAGRAM_ACCOUNT_ID ? 'INSTAGRAM' : 'FACEBOOK';
+  const channel  = object === 'instagram' || pageId === process.env.META_INSTAGRAM_ACCOUNT_ID
+    ? 'INSTAGRAM'
+    : 'FACEBOOK';
 
   let customer = await prisma.customer.findFirst({ where: { phone: `ig_${senderId}` } });
   if (!customer) {
@@ -189,10 +212,16 @@ async function handleIncomingInstagramFacebook(messaging: any, pageId: string) {
     conversation = await prisma.conversation.create({
       data: { customerId: customer.id, channel: channel as any, externalId: senderId, status: 'OPEN', lastMessageAt: new Date() },
     });
+  } else {
+    // Igual que en WhatsApp: sube arriba en la bandeja y queda sin leer.
+    await prisma.conversation.update({
+      where: { id: conversation.id },
+      data: { lastMessageAt: new Date(), isRead: false },
+    });
   }
 
   await prisma.message.create({
-    data: { conversationId: conversation.id, direction: 'INBOUND', content, status: 'DELIVERED' },
+    data: { conversationId: conversation.id, direction: 'INBOUND', content, status: 'DELIVERED', externalId: mid ?? null },
   });
 }
 

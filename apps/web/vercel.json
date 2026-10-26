@@ -4,7 +4,6 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "crons": [
-    { "path": "/api/cron/sync", "schedule": "0 * * * *" },
     { "path": "/api/cron/flows", "schedule": "*/10 * * * *" }
   ]
 }

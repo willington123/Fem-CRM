@@ -1,7 +1,7 @@
 # Fem CRM
 
 CRM omnicanal de Fem: bandeja de WhatsApp / Instagram / Facebook, seguimiento de
-pedidos de Mastershop y Shopify, flujos automáticos de mensajes y analítica.
+pedidos tomados por WhatsApp, flujos automáticos de mensajes y analítica.
 
 Next.js 14 (App Router) · Prisma · PostgreSQL en Supabase · Tailwind · desplegado en Vercel.
 
@@ -30,7 +30,7 @@ Comprobación rápida de que todo respira: entra en **Ajustes** y pulsa
 
 ### Vista previa sin credenciales
 
-Para ver el CRM funcionando antes de tener Supabase, Meta o Mastershop:
+Para ver el CRM funcionando antes de tener Supabase o Meta:
 
 ```bash
 npm run preview            # o `npm run preview -- --reset` para resembrar
@@ -56,8 +56,6 @@ también en la pantalla **Ajustes** del CRM. Resumen de dónde se saca cada cosa
 |---|---|---|
 | **Supabase** | `DATABASE_URL`, `DIRECT_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → Database y → API |
 | **Meta / WhatsApp** | `WHATSAPP_ACCESS_TOKEN` (permanente), `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID`, `META_APP_SECRET`, `META_WEBHOOK_VERIFY_TOKEN` | developers.facebook.com → app → WhatsApp |
-| **Mastershop** | `MASTERSHOP_API_KEY`, `MASTERSHOP_WEBHOOK_SECRET` | Mastershop → Configuración → Integraciones |
-| **Shopify** | `SHOPIFY_SHOP_DOMAIN`, `SHOPIFY_ACCESS_TOKEN`, `SHOPIFY_WEBHOOK_SECRET` | Admin → Settings → Apps → Develop apps |
 | **Propias** | `JWT_SECRET`, `CRON_SECRET`, `NEXT_PUBLIC_APP_URL` | las generas tú (`openssl rand -base64 48`) |
 
 > El token de WhatsApp tiene que ser el **permanente de un usuario de sistema**.
@@ -71,9 +69,6 @@ Con el CRM ya desplegado, registra estas URLs en cada panel. La pantalla
 | Proveedor | URL | Eventos |
 |---|---|---|
 | Meta | `https://TU-DOMINIO/api/webhooks/meta` | `messages`, `message_status` |
-| Mastershop | `https://TU-DOMINIO/api/webhooks/mastershop` | cambios de estado de pedido |
-| Shopify | `https://TU-DOMINIO/api/webhooks/shopify/orders/create` | `orders/create` |
-| Shopify | `https://TU-DOMINIO/api/webhooks/shopify/orders/fulfilled` | `orders/fulfilled` |
 
 ---
 
@@ -83,12 +78,11 @@ Con el CRM ya desplegado, registra estas URLs en cada panel. La pantalla
 src/
   app/
     (auth)/login          entrada; valida contra Supabase Auth y firma un JWT propio
-    (dashboard)/          dashboard · bandeja · clientas · pedidos · carritos
+    (dashboard)/          dashboard · bandeja · clientas · pedidos
                           flujos · plantillas · ajustes
     api/                  rutas del servidor (todas piden sesión salvo webhooks y health)
   services/
-    mastershop.ts         cliente de la API (reintentos, paginado, normalización)
-    mastershop-sync.ts    sincronización pedidos → CRM y recálculo de métricas
+    orders.ts             número de pedido, historial de estados y métricas de la clienta
     whatsapp.ts           envío de mensajes y plantillas por la Cloud API
     whatsapp-inbound.ts   traduce cualquier mensaje entrante a algo legible
     order-flow.ts         motor del recorrido del pedido (paso 1 al 8)
@@ -97,12 +91,16 @@ src/
     integrations.ts       catálogo de credenciales — fuente de verdad de Ajustes
 ```
 
-**Los webhooks son el tiempo real; el cron es la red de seguridad.** Mastershop
-avisa de cada cambio de estado al instante, y `/api/cron/sync` vuelve a leer los
-últimos 30 días cada hora para recuperar cualquier evento perdido.
+**Los pedidos se toman en el chat.** En la bandeja, «Crear pedido» los registra;
+en **Pedidos** se les cambia el estado y se agrega la guía y la transportadora.
+Cada cambio de estado dispara el WhatsApp de su paso si ese flujo está encendido.
 `/api/cron/flows` corre cada 10 minutos y despacha lo programado (el recordatorio
-de confirmación a los 90 min y la escalada a una persona 2 h después).
-Ambos crons están declarados en `vercel.json`.
+de confirmación a los 90 min y la escalada a una persona 2 h después); está
+declarado en `vercel.json`.
+
+Las tablas `abandoned_carts` y `mastershop_guides` y las columnas `shopify_*`
+de `orders` vienen de integraciones anteriores: se conservan para no perder los
+pedidos históricos.
 
 ---
 
